@@ -10,6 +10,7 @@ logs/*
 devops/settings_local.py
 devops/settings.py
 *.conf
+*.ini
 .DS_Store
 .vscode
-
+utils/
