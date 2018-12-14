@@ -65,6 +65,15 @@ def login(request, redirect_field_name=REDIRECT_FIELD_NAME, authentication_form=
                     if not is_safe_url(url=redirect_to, host=request.get_host()):
                         redirect_to = resolve_url(djsettings.LOGIN_REDIRECT_URL)
                     auth_login(request, form.get_user())
+                    Message.objects.create(type=u'用户登录', user=request.user, action=u'用户登录',
+                                           action_ip=UserIP(request), content='用户登录 %s'%request.user)
+                    return HttpResponseRedirect(redirect_to)
+            else:
+                username = request.POST.get('username')
+                user = Users.objects.get(username=username)
+                Message.objects.create(type=u'用户登录', user=user, action=u'用户登录',
+                                       action_ip=UserIP(request),
+                                       content=u'用户登录失败 %s' % request.POST.get('username'))
 
     else:
         form = authentication_form(request)
@@ -75,6 +84,9 @@ def logout(request, next_page=None, redirect_field_name=REDIRECT_FIELD_NAME):
     """
     Logs out the user and displays 'You are logged out' message.
     """
+    Message.objects.create(type=u'用户退出', user=request.user, action=u'用户退出', action_ip=UserIP(request),
+                           content='用户退出 %s' % request.user)
+
     auth_logout(request)
 
     if next_page is not None:
@@ -96,7 +108,7 @@ def logout(request, next_page=None, redirect_field_name=REDIRECT_FIELD_NAME):
 
 @login_required
 def logoutw(request):
-    auth.logout(request)
+
     return HttpResponseRedirect('/')
 
 
