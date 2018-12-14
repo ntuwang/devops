@@ -24,11 +24,24 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.shortcuts import resolve_url
 from django.utils.http import is_safe_url
 from django.conf import settings as djsettings
+from message.models import Message
 
 from user.models import Users
 import json
 
 from .forms import *
+
+def UserIP(request):
+    '''
+    获取用户IP
+    '''
+
+    ip = ''
+    if 'HTTP_X_FORWARDED_FOR' in request.META:
+        ip = request.META['HTTP_X_FORWARDED_FOR']
+    else:
+        ip = request.META['REMOTE_ADDR']
+    return ip
 
 
 @login_required
@@ -85,3 +98,48 @@ def logout(request, next_page=None, redirect_field_name=REDIRECT_FIELD_NAME):
 def logoutw(request):
     auth.logout(request)
     return HttpResponseRedirect('/')
+
+
+@login_required
+def user_list(request):
+    all_users = Users.objects.all()
+    return render(request, 'user/user_list.html', {'all_users':all_users})
+
+@login_required
+def user_manage(request, aid=None, action=None):
+    if request.user.has_perms(['asset.view_user', 'asset.edit_user']):
+        page_name = ''
+        if aid:
+            user = get_object_or_404(Users, pk=aid)
+            if action == 'edit':
+                page_name = '编辑用户'
+            if action == 'delete':
+                user.delete()
+                Message.objects.create(type=u'用户管理', user=request.user, action=u'删除用户', action_ip=UserIP(request),
+                                       content=u'删除用户 %s%s，用户名 %s' % (user.last_name, user.first_name, user.username))
+                return redirect('user_list')
+        else:
+            user = Users()
+            action = 'add'
+            page_name = '新增用户'
+
+        if request.method == 'POST':
+            form = UserForm(request.POST, instance=user)
+            if form.is_valid():
+                password1 = request.POST.get('password1')
+                password2 = request.POST.get('password2')
+                if action == 'add' or action == 'edit':
+                    form.save()
+                    if password1 and password1 == password2:
+                        user.set_password(password1)
+                    user.save()
+                    Message.objects.create(type=u'用户管理', user=request.user, action=page_name, action_ip=UserIP(request),
+                                               content=u'%s %s%s，用户名 %s' % (
+                                               page_name, user.last_name, user.first_name, user.username))
+                    return redirect('user_list')
+        else:
+            form = UserForm(instance=user)
+
+        return render(request, 'user/user_manage.html', {'form':form, 'page_name':page_name, 'action':action, 'aid':aid})
+    else:
+        raise Http404

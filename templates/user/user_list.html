@@ -1,0 +1,195 @@
+{% extends 'base/base.html' %}
+{% load myfilter %}
+{% block css %}
+    <link href="/static/css/dataTables.bootstrap.min.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <a href="{% url 'user_add' %}" style="float:left;" class="btn btn-info btn-sm" role="button"
+                               {% if not perms.asset.change_idcasset %}disabled{% endif %}><i
+                                    class="fa fa-plus"></i></a>
+                            <div class="loading"></div>
+                            <h2>用户管理 </h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a href="javascript:changeDisplay(1)" data-toggle="tooltip" data-placement="bottom"
+                                       title="默认显示"><i class="fa fa-th"></i></a></li>
+                                <li><a href="javascript:changeDisplay(2)" data-toggle="tooltip" data-placement="bottom"
+                                       title="表格显示"><i class="fa fa-table"></i></a></li>
+                                <li><a class="collapse-link" data-toggle="tooltip" data-placement="bottom" title="折叠内容"><i
+                                        class="fa fa-chevron-up"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" style="padding-top:10px;border:none">
+                            <div id="show_col" style="">
+                                <div class="clearfix"></div>
+                                {% for i in all_users %}
+                                    <div class="col-md-4 col-sm-4 col-xs-12 profile_details">
+                                        <div class="well profile_view">
+                                            <div class="col-sm-12">
+
+                                                <div class="left col-xs-7">
+                                                    <strong>{{ i.username }}</strong>
+                                                    <small>
+                                                        {% if i.role == 'SU' %}
+                                                            超级管理员
+                                                        {% elif i.role == 'GA' %}
+                                                            组管理员
+                                                        {% else %}
+                                                            普通用户
+                                                        {% endif %}
+                                                    </small>
+                                                    <ul class="list-unstyled">
+                                                        <li><i class="fa fa-envelope-o"></i> {{ i.email }}</li>
+                                                        <li><i class="fa fa-phone"></i> {{ i.mobile }}</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="right col-xs-5 text-center">
+                                                    <img src="/static/images/avatar2.jpg" alt=""
+                                                         class="img-circle img-responsive">
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12 bottom text-center">
+                                                <div class="col-xs-12 col-sm-6 emphasis">
+                                                    <p>最近登录：{{ i.last_login|date:"Y-m-d" }}</p>
+                                                </div>
+                                                <div class="col-xs-12 col-sm-6 emphasis">
+                                                    {% if i.is_active %}
+                                                        <span class="label label-info">激活</span>{% else %}
+                                                        <span class="label label-danger">冻结</span>{% endif %}
+                                                    <div class="btn-group">
+                                                        <a href="{% url 'user_manage' aid=i.pk action='edit' %}"
+                                                           class="btn btn-success btn-xs" role="button"><i
+                                                                class="fa fa-pencil"></i></a>
+                                                        <a href="#" data-toggle="modal"
+                                                           data-target="#reqDelete-{{ i.pk }}"
+                                                           class="btn btn-danger btn-xs" role="button"><i
+                                                                class="fa fa-trash-o "></i></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 模态框（Modal） -->
+                                    <div class="modal fade" id="reqDelete-{{ i.pk }}" tabindex="-1" role="dialog"
+                                         aria-labelledby="reqDelete" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal"
+                                                            aria-hidden="true">&times;
+                                                    </button>
+                                                    <h4 class="modal-title" id="reqDelete">提示</h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                    确认是否删除？
+                                                    <div><br/><strong>{{ i.last_name }}{{ i.first_name }}</strong></div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-default btn-sm"
+                                                            data-dismiss="modal">关闭
+                                                    </button>
+                                                    <a style="margin:4px;" class="btn btn-danger btn-sm"
+                                                       href="{% url 'user_manage' aid=i.pk action='delete' %}">删除</a>
+                                                </div>
+                                            </div><!-- /.modal-content -->
+                                        </div><!-- /.modal-dialog -->
+                                    </div><!-- /.modal -->
+                                {% endfor %}
+                            </div>
+                            <div id="show_table" style="display: none;">
+                                <div class="x_content table-responsive" style="border:none">
+                                    <table id="datatable" class="table table-striped table-bordered"
+                                           style="width:100%;">
+                                        <thead>
+                                        <tr>
+                                            <th>用户</th>
+                                            <th>邮箱</th>
+                                            <th>手机</th>
+                                            <th>用户组</th>
+                                            <th>最近登录</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for i in all_users %}
+                                            <tr>
+                                                <td>{{ i.first_name }}</td>
+                                                <td>{{ i.email }}</td>
+                                                <td>{{ i.mobile }}</td>
+                                                <td>{% for g in i.group.all %}
+                                                    <span class="label label-info">{{ g.group_name }}</span>
+                                                    &nbsp;{% endfor %}</td>
+                                                <td>{{ i.last_login|date:"Y-m-d H:i:s" }}</td>
+                                                <td>{% if i.is_active %}
+                                                    <span class="label label-info">激活</span>{% else %}
+                                                    <span class="label label-danger">冻结</span>{% endif %}</td>
+                                                <td>
+                                                    <a href="{% url 'user_manage' aid=i.pk action='edit' %}"
+                                                       class="btn btn-success btn-sm" role="button"><i
+                                                            class="fa fa-pencil"></i></a>
+                                                    <a href="#" data-toggle="modal" data-target="#reqDelete-t{{ i.pk }}"
+                                                       class="btn btn-danger btn-sm" role="button"><i
+                                                            class="fa fa-trash-o "></i></a>
+                                                </td>
+                                                <!-- 模态框（Modal） -->
+                                                <div class="modal fade" id="reqDelete-t{{ i.pk }}" tabindex="-1"
+                                                     role="dialog" aria-labelledby="reqDelete" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <button type="button" class="close" data-dismiss="modal"
+                                                                        aria-hidden="true">&times;
+                                                                </button>
+                                                                <h4 class="modal-title" id="reqDelete">提示</h4>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                确认是否删除？
+                                                                <div><br/><strong>
+                                                                    {{ i.last_name }}{{ i.first_name }}</strong></div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-default btn-sm"
+                                                                        data-dismiss="modal">关闭
+                                                                </button>
+                                                                <a style="margin:4px;" class="btn btn-danger btn-sm"
+                                                                   href="{% url 'user_manage' aid=i.pk action='delete' %}">删除</a>
+                                                            </div>
+                                                        </div><!-- /.modal-content -->
+                                                    </div><!-- /.modal-dialog -->
+
+                                                </div><!-- /.modal -->
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script src="/static/js/jquery.dataTables.min.js"></script>
+    <script src="/static/js/dataTables.bootstrap.min.js"></script>
+    <script src="/static/js/display_select.js"></script>
+    <script>
+        <!--
+        Datatables -->
+        $(document).ready(function () {
+            $('#datatable').dataTable();
+        });
+        <!-- /Datatables -->
+    </script>
+{% endblock %}

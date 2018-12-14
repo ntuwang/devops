@@ -23,11 +23,11 @@ class LoginForm(forms.Form):
 class UserForm(forms.ModelForm):
     class Meta:
         model = Users
-        fields = ('username', 'first_name', 'email', 'mobile', 'role', 'is_active')
+        email = forms.CharField(label='邮箱')
+        fields = ('username', 'email', 'mobile', 'role', 'is_active')
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '用户名', 'required': 'required',
                                                'data-validate-length-range': '5,30'}),
-            'first_name': forms.TextInput(attrs={'class': 'form-control', 'required': 'required'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'required': 'required'}),
             'qq': forms.TextInput(attrs={'class': 'form-control', 'data-validate-length-range': '4,16'}),
             'mobile': forms.TextInput(attrs={'class': 'form-control', 'data-validate-length': '11'}),
