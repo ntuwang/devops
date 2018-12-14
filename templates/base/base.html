@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+        {% block meta %}
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <!-- Meta, title, CSS, favicons, etc. -->
+            <meta charset="utf-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+        {% endblock meta %}
+
+        <title>DevOps | {% block title %}{% endblock %}</title>
+
+        {% block stylesheets %}
+            <link rel="shortcut icon" href="/static/images/favicon.ico"/>
+
+            <!-- Bootstrap -->
+            <link href="/static/vendors/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+            <!-- Font Awesome -->
+            <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+            <!-- bootstrap-daterangepicker -->
+            <link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+            <!-- Custom Theme Style -->
+            <link href="/static/custom/css/custom.css" rel="stylesheet">
+        {% endblock stylesheets %}
+        <!-- Custom Theme Style -->
+        <link href="/static/custom/css/custom.css" rel="stylesheet">
+    {% endblock head %}
+</head>
+
+<body class="{% block body_class %}nav-md {% endblock body_class %}">
+{% block body %}
+    <div class="container body">
+        <div class="main_container">
+
+            {% block sidebar %}
+                <div class="col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+                    {% include "base/sidebar.html" %}
+                </div>
+            {% endblock sidebar %}
+
+            {% block top_navigation %}
+                <div class="top_nav">
+                    {% include "base/top_navigation.html" %}
+                </div>
+            {% endblock top_navigation %}
+
+            {% block content %}
+                <!-- {{ content }} -->
+            {% endblock content %}
+
+            {% block footer %}
+                <footer>
+                    {% include "base/footer.html" %}
+                </footer>
+            {% endblock footer %}
+        </div>
+    </div>
+
+    {% block javascripts %}
+        <!-- jQuery -->
+        <script src="/static/vendors/jquery/jquery.min.js"></script>
+        <!-- Bootstrap -->
+        <script src="/static/vendors/bootstrap/js/bootstrap.min.js"></script>
+
+        <!-- bootstrap-daterangepicker -->
+        <script src="/static/vendors/moment/moment.min.js"></script>
+        <script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+    {% endblock %}
+    <!-- Custom Theme Scripts -->
+    <script src="/static/custom/js/custom.js"></script>
+{% endblock body %}
+</body>
+</html>

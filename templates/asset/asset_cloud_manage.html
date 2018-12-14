@@ -1,0 +1,73 @@
+{% extends 'base/base.html' %}
+{% block title %} 云计算管理 {% endblock title %}
+{% load myinclusion %}
+{% block stylesheets %}
+    {{ block.super }}
+{% endblock %}
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="clearfix"></div>
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>{{ page_name }}
+                                <small>|&nbsp;<a href="{% url 'cloud_asset_list' %}">云计算中心</a></small>
+                            </h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                       aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                </li>
+                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+
+                            <form class="form-horizontal form-border" method="post" action=""
+                                  enctype="multipart/form-data">
+                                {% csrf_token %}
+                                {% for i in form %}
+                                    <div class="item form-group">
+                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">{{ i.label_tag }}
+                                        </label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            {{ i }}
+                                            <div style="padding-top:10px;">
+                                                {{ i.errors }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                {{ hform.as_p }}
+                                <div class="ln_solid"></div>
+                                <div class="form-group">
+                                    <div class="col-md-6 col-md-offset-3">
+                                        {% ifequal action 'add' %}
+                                            <button id="send" type="submit" class="btn btn-success">添加</button>
+                                        {% endifequal %}
+                                        {% ifequal action 'edit' %}
+                                            <button id="send" type="submit" class="btn btn-success">更新</button>
+                                        {% endifequal %}
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ block.super }}
+{% endblock %}

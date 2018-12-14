@@ -1,0 +1,113 @@
+{% extends 'base/base.html' %}
+{% block title %} 资源列表 {% endblock title %}
+{% block stylesheets %}
+    {{ block.super }}
+{% endblock %}
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="clearfix"></div>
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+
+                        <form class="form-horizontal form-border" method="get" action="" name="formName">
+                            <div class="info">
+                                <a href="{% url 'server_add' %}" class="btn btn-info btn-sm" role="button"
+                                   {% if not perms.asset.edit_asset %}disabled{% endif %}>添加资产</a>
+                             {% comment %}   <a href="{% url 'server_info' %}?action=flush" class="btn btn-info btn-sm" role="button"
+                                   {% if not perms.asset.edit_asset %}disabled{% endif %}>刷新资产信息</a>
+                                <button type="submit" class="btn btn-info btn-sm" name="export" value="check">导出
+                                </button>
+                                <button type="submit" class="btn btn-info btn-sm" name="export" value="check_all">全部导出
+                                </button>{% endcomment %}
+                            </div>
+                        </form>
+                    </div>
+                    <div class="x_content table-responsive" style="border:none">
+                        <div class="ln_solid"></div>
+                        <table id="datatable" class="table table-striped table-bordered">
+                            <thead>
+                            <tr>
+                                <th><input type="checkbox" name="alls" onClick="selectAll('formName','id')"
+                                           title="全选/反选">
+                                </th>
+                                <th>详细</th>
+                                <th>主机名</th>
+                                {#                                <th>内网IP</th>#}
+                                <th>外网IP</th>
+                                <th>规格</th>
+                                <th>操作系统</th>
+                                <th>状态</th>
+                                <th>云供应商</th>
+                                <th>负责人</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for server in all_server %}
+                                <tr id="{{ server.pk }}">
+                                    <td><input class="icheck" type="checkbox" value="{{ server.pk }}" name="id"></td>
+                                    <td><a href="{% url 'server_info' %}?aid={{ server.pk }}"><i
+                                            class="fa fa-envelope"></i></a>
+                                    </td>
+                                    <td>{{ server.hostname }}</td>
+                                    <td>{{ server.public_ip }}</td>
+                                    <td>{{ server.size }}</td>
+                                    <td>{{ server.os }}</td>
+                                    <td>{{ server.status }}</td>
+                                    <td>{{ server.region }}|{{ server.region.get_provider_display }}</td>
+                                    <td>{{ server.owner }}</td>
+                                    {% if perms.asset.edit_asset %}
+                                        <td>
+                                            <a href="{% url 'server_manage' aid=server.pk action='edit' %}"
+                                               class="btn btn-success btn-sm" role="button"><i
+                                                    class="fa fa-edit"></i></a>
+                                            <a href="#" data-toggle="modal"
+                                               data-target="#reqDelete-{{ server.pk }}"
+                                               class="btn btn-danger btn-sm" role="button"><i
+                                                    class="fa fa-trash-o "></i></a>
+                                        </td>
+                                    {% endif %}
+                                    <div class="modal fade" id="reqDelete-{{ server.pk }}"
+                                         tabindex="-1" role="dialog" aria-labelledby="reqDelete"
+                                         aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal"
+                                                            aria-hidden="true">&times;
+                                                    </button>
+                                                    <h4 class="modal-title" id="reqDelete">提示</h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                    确认是否删除？
+                                                    <div><br/><strong>{{ server.hostname }}</strong></p>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-default btn-sm"
+                                                            data-dismiss="modal">关闭
+                                                    </button>
+                                                    <a style="margin:4px;" class="btn btn-danger btn-sm"
+                                                       href="{% url 'server_manage' aid=server.pk action='delete' %}">删除</a>
+                                                </div>
+                                            </div><!-- /.modal-content -->
+                                        </div><!-- /.modal-dialog -->
+                                    </div><!-- /.modal -->
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ block.super }}
+{% endblock %}

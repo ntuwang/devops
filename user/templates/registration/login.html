@@ -1,0 +1,23 @@
+{% extends 'registration/base.html' %}
+{% load myfilter %}
+{% block content %}
+{% if user.is_authenticated %}
+<script>window.location.href='/';</script>
+{% endif %}
+{% for i in form %}
+    {{ i|add_class:"form-control" }}
+{% endfor %}
+{% if form.errors %}
+<blockquote style="text-align:left;">用户名或密码错误！</blockquote>
+{% endif %}
+
+<div>
+    <button class="btn btn-default submit" value="login" name="login">登录</button>
+    <a class="reset_pass" href="#">忘记密码？</a>
+</div>
+
+<div class="clearfix"></div>
+
+<div class="separator">
+</div>
+{% endblock %}
