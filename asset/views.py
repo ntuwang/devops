@@ -5,7 +5,7 @@
 
 
 from message.models import Message
-from utils.saltapi import SaltAPI
+from utils.saltapi import SaltApi
 from django.conf import settings
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -34,7 +34,7 @@ from io import StringIO
 import json
 
 cps = ConfParser('devops/settings.conf')
-sapi = SaltAPI(url=cps.get('saltstack', 'url'), username=cps.get('saltstack', 'username'),
+sapi = SaltApi(url=cps.get('saltstack', 'url'), username=cps.get('saltstack', 'username'),
                password=cps.get('saltstack', 'password'))
 
 
