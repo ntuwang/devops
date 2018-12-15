@@ -13,4 +13,3 @@ devops/settings.py
 *.ini
 .DS_Store
 .vscode
-
