@@ -16,7 +16,8 @@ from django.db.models import Q
 from user.views import UserIP
 from asset.forms import *
 from asset.models import *
-from utils.config_parser import ConfParser
+from utils.config_parser import Conf_Parser
+from asset.asset_info import MultipleCollect
 
 try:
     import json
@@ -33,7 +34,7 @@ import tarfile, zipfile
 from io import StringIO
 import json
 
-cps = ConfParser('devops/settings.conf')
+cps = Conf_Parser('conf/settings.conf')
 sapi = SaltApi(url=cps.get('saltstack', 'url'), username=cps.get('saltstack', 'username'),
                password=cps.get('saltstack', 'password'))
 
@@ -52,6 +53,31 @@ def get_server_asset_info(request):
                 aid = request.get_full_path().split('=')[1]
                 server_detail = ServerAsset.objects.filter(id=aid)
                 return render(request, 'asset/asset_server_detail.html', {'server_detail': server_detail})
+            if 'action' in request.GET:
+                if request.user.has_perm('asset.edit_asset'):
+                    action = request.get_full_path().split('=')[1]
+                    if action == 'flush':
+                        q = SaltHost.objects.filter(alive=True)
+                        tgt_list = []
+                        [tgt_list.append(i.nodename) for i in q]
+                        ret = MultipleCollect(tgt_list)
+                        for i in ret:
+                            try:
+                                server_asset = get_object_or_404(ServerAsset, nodename=i['nodename'])
+                                hostname = server_asset.hostname
+                                for j in i:
+                                    if i[j] != 'Nan':
+                                        setattr(server_asset, j, i[j])
+                                server_asset.hostname = hostname
+                                server_asset.save()
+                            except:
+                                server_asset = ServerAsset()
+                                for j in i:
+                                    setattr(server_asset, j, i[j])
+                                server_asset.save()
+                        return redirect('server_info')
+                else:
+                    raise Http404
 
         else:
             raise Http404
@@ -245,11 +271,11 @@ def salt_key_import(request):
             except:
                 alive = False
             try:
-                SaltHost.objects.create(hostname=node_name, alive=alive, status=True)
+                SaltHost.objects.create(nodename=node_name, alive=alive, status=True)
             except:
-                salthost = SaltHost.objects.get(hostname=node_name)
+                salthost = SaltHost.objects.get(nodename=node_name)
                 now = datetime.datetime.now()
-                alive_old = SaltHost.objects.get(hostname=node_name).alive
+                alive_old = SaltHost.objects.get(nodename=node_name).alive
                 if alive != alive_old:
                     salthost.alive_time_last = now
                     salthost.alive = alive
@@ -257,46 +283,46 @@ def salt_key_import(request):
                 salthost.save()
         for node_name in minions_pre:
             try:
-                SaltHost.objects.get_or_create(hostname=node_name, alive=alive, status=False)
+                SaltHost.objects.get_or_create(nodename=node_name, alive=alive, status=False)
             except:
                 print('not create')
 
-        return redirect('key_list')
+        return redirect('salt_key_list')
     else:
         raise Http404
 
 
 @login_required
-def salt_key_manage(request, hostname=None):
+def salt_key_manage(request, nodename=None):
     '''
     接受或拒绝salt主机，同时更新数据库
     '''
     if request.user.is_superuser:
         if request.method == 'GET':
-            hostname = request.GET.get('hostname')
-            salthost = SaltHost.objects.get(hostname=hostname)
+            nodename = request.GET.get('nodename')
+            salthost = SaltHost.objects.get(nodename=nodename)
             action = ''
 
-            if request.GET.has_key('add'):
-                ret = sapi.accept_key(hostname)
+            if 'add' in request.GET:
+                ret = sapi.accept_key(nodename)
                 if ret:
                     salthost.status = True
                     salthost.save()
                     result = 3
                     action = u'添加主机'
-            if request.GET.has_key('delete'):
-                ret = sapi.delete_key(hostname)
+            if 'delete' in request.GET:
+                ret = sapi.delete_key(nodename)
                 if ret:
                     salthost.status = False
                     salthost.save()
                     result = 2
                     action = u'删除主机'
-            if request.GET.has_key('flush') and request.is_ajax():
+            if 'flush' in request.GET and request.is_ajax():
                 # result: 0 在线 | 1 离线
                 result = 0
-                ret = sapi.salt_alive(hostname)
+                ret = sapi.salt_alive(nodename)
                 try:
-                    alive = ret[hostname]
+                    alive = ret[nodename]
                     alive = True
                 except:
                     alive = False
@@ -305,16 +331,16 @@ def salt_key_manage(request, hostname=None):
                 salthost.save()
                 action = u'刷新主机'
                 if action:
-                    Message.objects.create(type=u'部署管理', user=request.user.first_name, action=action,
+                    Message.objects.create(type=u'部署管理', user=request.user, action=action,
                                            action_ip=UserIP(request),
-                                           content=u'%s %s' % (action, salthost.hostname))
+                                           content=u'%s %s' % (action, salthost.nodename))
                 return HttpResponse(json.dumps(result))
 
             if action:
-                Message.objects.create(type=u'部署管理', user=request.user.first_name, action=action,
-                                       action_ip=UserIP(request), content=u'%s %s' % (action, salthost.hostname))
+                Message.objects.create(type=u'部署管理', user=request.user, action=action,
+                                       action_ip=UserIP(request), content=u'%s %s' % (action, salthost.nodename))
 
-        return redirect('key_list')
+        return redirect('salt_key_list')
     else:
         raise Http404
 
@@ -327,7 +353,7 @@ def salt_group_list(request):
 
     if request.user.is_superuser:
         groups = SaltGroup.objects.all()
-        return render(request, 'salt_group_list.html', {'all_groups': groups})
+        return render(request, 'asset/salt_group_list.html', {'all_groups': groups})
     else:
         raise Http404
 
@@ -350,11 +376,11 @@ def salt_group_manage(request, id=None):
             page_name = '新增分组'
 
         if request.method == 'GET':
-            if request.GET.has_key('delete'):
+            if 'delete' in request.GET:
                 id = request.GET.get('id')
                 group = get_object_or_404(SaltGroup, pk=id)
                 group.delete()
-                Message.objects.create(type=u'部署管理', user=request.user.first_name, action=u'删除分组',
+                Message.objects.create(type=u'部署管理', user=request.user, action=u'删除分组',
                                        action_ip=UserIP(request), content='删除分组 %s' % group.nickname)
                 with open('./saltconfig/nodegroup.conf', 'r') as f:
                     with open('./nodegroup', 'w') as g:
@@ -362,7 +388,7 @@ def salt_group_manage(request, id=None):
                             if group.groupname not in line:
                                 g.write(line)
                 shutil.move('./nodegroup', './saltconfig/nodegroup.conf')
-                return redirect('group_list')
+                return redirect('salt_group_list')
 
         if request.method == 'POST':
             form = SaltGroupForm(request.POST, instance=group)
@@ -379,12 +405,12 @@ def salt_group_manage(request, id=None):
                 group.minions.add(*minion_select)
                 group.minions.remove(*minion_delete)
                 group.save()
-                Message.objects.create(type=u'部署管理', user=request.user.first_name, action=page_name,
+                Message.objects.create(type=u'部署管理', user=request.user, action=page_name,
                                        action_ip=UserIP(request), content='%s %s' % (page_name, group.nickname))
 
                 minions_l = []
-                for m in group.minions.values('hostname'):
-                    minions_l.append(m['hostname'])
+                for m in group.minions.values('nodename'):
+                    minions_l.append(m['nodename'])
                 minions_str = ','.join(minions_l)
                 try:
                     with open('./saltconfig/nodegroup.conf', 'r') as f:
@@ -395,16 +421,14 @@ def salt_group_manage(request, id=None):
                             g.write("  %s: 'L@%s'\n" % (group.groupname, minions_str))
                     shutil.move('./nodegroup', './saltconfig/nodegroup.conf')
                 except:
-                    with open('./saltconfig/nodegroup.conf', 'w') as g:
+                    with open('conf/saltconfig/nodegroup.conf', 'w') as g:
                         g.write("nodegroups:\n  %s: 'L@%s'\n" % (group.groupname, minions_str))
 
-                import subprocess
-                subprocess.Popen('systemctl restart salt-master salt-api', shell=True)
-                return redirect('group_list')
+                return redirect('salt_group_list')
         else:
             form = SaltGroupForm(instance=group)
 
-        return render(request, 'salt_group_manage.html',
+        return render(request, 'asset/salt_group_manage.html',
                       {'form': form, 'action': action, 'page_name': page_name, 'aid': id})
     else:
         raise Http404
@@ -429,7 +453,7 @@ def salt_module_list(request):
                 ModuleUpload.objects.filter(user_group=g)]
             # 合并list
             module_list = module_visible_list + [i for i in module_user_group_list if i not in module_visible_list]
-        return render(request, 'salt_module_list.html', {'modules': module_list})
+        return render(request, 'asset/salt_module_list.html', {'modules': module_list})
     else:
         raise Http404
 
@@ -455,13 +479,13 @@ def salt_module_manage(request, id=None):
             page_name = '新增模块'
 
         if request.method == 'GET':
-            if request.GET.has_key('delete'):
+            if 'delete' in request.GET:
                 id = request.GET.get('id')
                 module = get_object_or_404(ModuleUpload, pk=id)
                 if request.user.pk != module.user.pk and not request.user.is_superuser:
                     return HttpResponse("Not Allowed!")
                 module.delete()
-                Message.objects.create(type=u'部署管理', user=request.user.first_name, action=u'删除模块',
+                Message.objects.create(type=u'部署管理', user=request.user, action=u'删除模块',
                                        action_ip=UserIP(request), content=u'删除模块 %s' % module.name)
                 cur_path = module.upload_path.path.split('.')[0]
                 try:
@@ -498,7 +522,7 @@ def salt_module_manage(request, id=None):
                         form.save()
                     module.save()
 
-                    Message.objects.create(type=u'部署管理', user=request.user.first_name, action=page_name,
+                    Message.objects.create(type=u'部署管理', user=request.user, action=page_name,
                                            action_ip=UserIP(request), content='%s %s' % (page_name, module.name))
 
                     src = module.upload_path.path
@@ -534,13 +558,13 @@ def salt_module_manage(request, id=None):
                     if upload_stat:
                         return redirect('module_list')
                     else:
-                        return render(request, 'salt_module_manage.html',
+                        return render(request, 'asset/salt_module_manage.html',
                                       {'form': form, 'action': action, 'page_name': page_name, 'ret': ret})
                 else:
                     ret = u'不支持的文件格式，请上传.sls文件或.tar.gz/.tar.bz2/.zip压缩包！'
         else:
             form = ModuleForm(instance=module)
-        return render(request, 'salt_module_manage.html',
+        return render(request, 'asset/salt_module_manage.html',
                       {'form': form, 'action': action, 'page_name': page_name, 'ret': ret, 'id': id})
     else:
         raise Http404
@@ -560,7 +584,7 @@ def salt_ajax_minions(request):
                 group = SaltGroup.objects.get(groupname=tgt_select)
                 group_minions = group.minions.all()
                 for i in group_minions:
-                    ret.append(i.hostname)
+                    ret.append(i.nodename)
 
                 return HttpResponse(json.dumps(ret))
     else:

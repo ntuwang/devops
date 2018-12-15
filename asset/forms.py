@@ -40,9 +40,10 @@ class OwnerForms(forms.ModelForm):
 class ServerAssetForm(forms.ModelForm):
     class Meta:
         model = ServerAsset
-        fields = ['hostname', "public_ip", "size", "os", "status", "region","owner"]
+        fields = ['hostname','nodename', "public_ip", "size", "os", "status", "region","owner"]
         widgets = {
             'hostname': forms.TextInput(attrs={'class': 'form-control'}),
+            'nodename': forms.TextInput(attrs={'class': 'form-control'}),
             'private_ip': forms.TextInput(attrs={'class': 'form-control'}),
             'public_ip': forms.TextInput(attrs={'class': 'form-control'}),
             'size': forms.TextInput(attrs={'class': 'form-control'}),

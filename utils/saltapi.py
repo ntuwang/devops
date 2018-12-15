@@ -119,6 +119,14 @@ class SaltApi(object):
         r = self.__post(json=params)
         return r[1]['return'][0]
 
+    def remote_server_info(self, tgt, fun):
+        '''
+        获取远程主机信息
+        '''
+        params = {'client': 'local', 'tgt': tgt, 'fun': fun}
+        r = self.__post(json=params)
+        return r[1]['return'][0][tgt]
+
 
 if __name__ == '__main__':
     data = {

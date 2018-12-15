@@ -6,9 +6,14 @@ from asset import views as aviews
 
 urlpatterns = [
 
-    url(r'^key_list/$', aviews.salt_key_list, name='key_list'),
-    url(r'^key_list_import/$', aviews.salt_key_import, name='key_import'),
-    url(r'^key_manage/$', aviews.salt_key_manage, name='key_manage'),
+    url(r'^salt_key_list/$', aviews.salt_key_list, name='salt_key_list'),
+    url(r'^salt_key_import/$', aviews.salt_key_import, name='salt_key_import'),
+    url(r'^salt_key_manage/$', aviews.salt_key_manage, name='salt_key_manage'),
+    url(r'^salt_group_list/$', aviews.salt_group_list, name='salt_group_list'),
+    url(r'^salt_group_manage/add/$', aviews.salt_group_manage, name='salt_group_add'),
+    url(r'^salt_group_manage/delete$', aviews.salt_group_manage, name='salt_group_delete'),
+    url(r'^salt_group_manage/(?P<id>\d+)/edit/$', aviews.salt_group_manage, name='salt_group_edit'),
+
     url(r'^asset/server_info/$', aviews.get_server_asset_info, name='server_info'),
     url(r'^server/edit/(?P<aid>\d+)/(?P<action>[\w-]+)/$', aviews.server_asset_manage, name='server_manage'),
     url(r'^owner_list/$', aviews.owner_list, name='owner_list'),

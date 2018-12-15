@@ -1,0 +1,102 @@
+{% extends 'base/base.html' %}
+{% load myfilter %}
+{% block stylesheets %}
+    {{ block.super }}
+<link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <a href="{% url 'salt_group_add' %}" style="float:left;" class="btn btn-info btn-sm" role="button" {% if not perms.deploy.edit_saltgroup %}disabled="disabled"{% endif %}><i class="fa fa-plus"></i></a>
+                        <h2>分组管理 </h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                            </li>
+                            <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#">Settings 1</a>
+                                </li>
+                                <li><a href="#">Settings 2</a>
+                                </li>
+                            </ul>
+                            </li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+
+
+                    {% for g in all_groups %}
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <div class="x_panel">
+                            <div class="x_title">
+                                <h2>{{ g.nickname }} <small>Salt主机分组</small></h2>
+                                <ul class="nav navbar-right panel_toolbox">
+                                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                                    <li><a href="{% url 'salt_group_edit' id=g.pk %}"><i class="fa fa-pencil"></i></a></li>
+                                    <li><a href="#"  data-toggle="modal" data-target="#reqDelete-{{ g.pk }}" {% if not perms.deploy.edit_saltgroup %}disabled="disabled"{% endif %}><i class="fa fa-trash-o "></i></a></li>
+
+                                    <!-- 模态框（Modal） -->
+                                    <div class="modal fade" id="reqDelete-{{ g.pk }}" tabindex="-1" role="dialog" aria-labelledby="reqDelete" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                    <h4 class="modal-title" id="reqDelete">提示</h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                    确认是否删除？
+                                                    <div><br /><strong>{{ g.groupname }}</strong></div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">关闭</button>
+                                                    <a style="margin:4px;" class="btn btn-danger btn-sm" href="{% url 'salt_group_delete' %}?id={{ g.pk }}&delete=1">删除</a>
+                                                </div>
+                                            </div><!-- /.modal-content -->
+                                        </div><!-- /.modal-dialog -->
+                                    </div><!-- /.modal -->
+
+                                </ul>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content">
+
+                                <div class="bs-example" data-example-id="simple-jumbotron">
+                                    <div class="x_content">
+                                        <table id="datatable1" class="table table-striped table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>主机</th>
+                                                    <th>状态</th>
+                                                    <th>授权</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for m in g|group_minions %}
+                                                <tr>
+                                                    <td>{{ m.nodename }}</td>
+                                                    <td>{{ m.alive }}</td>
+                                                    <td>{{ m.status }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

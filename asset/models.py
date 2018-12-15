@@ -95,7 +95,7 @@ class ServerAsset(models.Model):
 
 
 class SaltHost(models.Model):
-    hostname = models.CharField(
+    nodename = models.CharField(
         max_length=80,
         unique=True,
         verbose_name=u'主机名称')
@@ -108,7 +108,7 @@ class SaltHost(models.Model):
     status = models.BooleanField(default=False, verbose_name=u'是否加入salt管理')
 
     def __str__(self):
-        return self.hostname
+        return self.nodename
 
     class Meta:
         default_permissions = ()

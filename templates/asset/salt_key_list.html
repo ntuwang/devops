@@ -29,7 +29,7 @@
                         </ul>
                         <div class="clearfix"></div>
                     </div>
-                    <div class="info"><a href="{% url 'key_import' %}" class="btn btn-info btn-sm" role="button" {% if not perms.deploy.edit_salthost %}disabled="disabled"{% endif %} data-toggle="tooltip" data-placement="right" title="系统计划任务，如非必要，请勿执行此操作">刷新Salt主机列表</a></div>
+                    <div class="info"><a href="{% url 'salt_key_import' %}" class="btn btn-info btn-sm" role="button" {% if not perms.deploy.edit_salthost %}disabled="disabled"{% endif %} data-toggle="tooltip" data-placement="right" title="系统计划任务，如非必要，请勿执行此操作">刷新Salt主机列表</a></div>
                     <div class="x_content">
                         <div class="ln_solid"></div>
                         <div class="info">
@@ -44,9 +44,9 @@
                             <tbody>
                                 {% for m in all_minions_pre %}
                                 <tr>
-                                    <td>{{ m.hostname }}</td>
+                                    <td>{{ m.nodename }}</td>
                                     <td>
-                                        <a class="btn btn-info btn-sm" href="{% url 'key_manage' %}?hostname={{ m.hostname }}&add=1" {% if not perms.deploy.edit_salthost %}disabled="disabled"{% endif %}><i class="fa fa-plus-square "></i></a>
+                                        <a class="btn btn-info btn-sm" href="{% url 'salt_key_manage' %}?nodename={{ m.nodename }}&add=1" {% if not perms.deploy.edit_salthost %}disabled="disabled"{% endif %}><i class="fa fa-plus-square "></i></a>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -71,12 +71,12 @@
                             <tbody>
                                 {% for m in all_minions %}
                                 <tr>
-                                    <td>{{ m.hostname }}</td>
+                                    <td>{{ m.nodename }}</td>
                                     <td>{% if m.alive %}在线{% else %}离线{% endif %}</td>
                                     {% if perms.deploy.edit_salthost %}
                                     <td>
-                                        <a class="btn btn-info btn-sm" href="#" onclick="keyManage(this);" name="flush" value="{{ m.hostname }}" {% if not perms.deploy.edit_salthost %}disabled="disabled"{% endif %}><i class="fa fa-refresh "></i></a>
-                                        <a class="btn btn-danger btn-sm" href="{% url 'key_manage' %}?hostname={{ m.hostname }}&delete=1" {% if not perms.deploy.edit_salthost %}disabled="disabled"{% endif %}><i class="fa fa-trash-o "></i></a>
+                                        <a class="btn btn-info btn-sm" href="#" onclick="keyManage(this);" name="flush" value="{{ m.nodename }}" {% if not perms.deploy.edit_salthost %}disabled="disabled"{% endif %}><i class="fa fa-refresh "></i></a>
+                                        <a class="btn btn-danger btn-sm" href="{% url 'salt_key_manage' %}?nodename={{ m.nodename }}&delete=1" {% if not perms.deploy.edit_salthost %}disabled="disabled"{% endif %}><i class="fa fa-trash-o "></i></a>
                                     </td>
                                     {% endif %}
                                 </tr>
@@ -102,8 +102,8 @@
             });
 
 function keyManage(obj) {
-    var hostname = $(obj).attr("value");
-    var url = "{% url 'key_manage' %}?hostname=" + hostname + "&" + obj.name + "=1";
+    var nodename = $(obj).attr("value");
+    var url = "{% url 'salt_key_manage' %}?nodename=" + nodename + "&" + obj.name + "=1";
         $(".loading").show();
     $.ajax({
 type:"GET",

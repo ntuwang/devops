@@ -16,8 +16,9 @@
                             <div class="info">
                                 <a href="{% url 'server_add' %}" class="btn btn-info btn-sm" role="button"
                                    {% if not perms.asset.edit_asset %}disabled{% endif %}>添加资产</a>
-                             {% comment %}   <a href="{% url 'server_info' %}?action=flush" class="btn btn-info btn-sm" role="button"
-                                   {% if not perms.asset.edit_asset %}disabled{% endif %}>刷新资产信息</a>
+                                <a href="{% url 'server_info' %}?action=flush" class="btn btn-info btn-sm" role="button"
+                                   {% if not perms.asset.edit_asset %}disabled{% endif %}>刷新salt资产信息</a>
+                            {% comment %}
                                 <button type="submit" class="btn btn-info btn-sm" name="export" value="check">导出
                                 </button>
                                 <button type="submit" class="btn btn-info btn-sm" name="export" value="check_all">全部导出

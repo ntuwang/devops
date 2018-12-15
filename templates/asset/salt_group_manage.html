@@ -1,0 +1,142 @@
+{% extends 'base/base.html' %}
+{% load myinclusion %}
+{% load myuserauth %}
+{% block content %}
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>{{ page_name }} <small>|&nbsp;<a href="{% url 'salt_group_list' %}">分组管理</a></h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                            </li>
+                            <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#">Settings 1</a>
+                                </li>
+                                <li><a href="#">Settings 2</a>
+                                </li>
+                            </ul>
+                            </li>
+                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                            </li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+
+                        <form class="form-horizontal form-border" method="post" action="" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% if perms.deploy.edit_saltgroup %}
+                            <fieldset>
+                            {% else %}
+                            <fieldset disabled="disabled">
+                            {% endif %}
+                            {% for i in form %}
+                            <div class="item form-group">
+                                <label class="control-label col-md-2 col-sm-2 col-xs-12" style="text-align:left;">
+                                    {{ i.label_tag }} <span class="required">*</span>
+                                </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        {{ i }}
+                                        <div style="padding-top:10px;">
+                                        {{ i.errors }}
+                                        </div>
+                                    </div>
+                            </div>
+                            {% endfor %}
+                            <div class="ln_solid"></div>
+                            <div id="show_groups" class="row">
+                            {% show_minions aid 'saltgroup' %}
+                            </div>
+                            <div class="ln_solid"></div>
+                            <select hidden="hidden" id="minion_sel" name="minion_sel" size="8" multiple="multiple"></select>
+                            <select hidden="hidden" id="minion_del" name="minion_del" size="8" multiple="multiple"></select>
+                            <div class="form-group">
+                                <div>
+                                    {% ifequal action 'add' %}
+                                    <button id="send" type="submit" class="btn btn-success">添加</button>
+                                    {% endifequal %}
+                                    {% ifequal action 'edit' %}
+                                    <button id="send" type="submit" class="btn btn-success">更新</button>
+                                    {% endifequal %}
+                                </div>
+                            </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ block.super }}
+<!-- validator -->
+<script type="text/javascript" src="/static/others/validator.min.js"></script>
+<script type="text/javascript" src="/static/others/multiselect.min.js"></script>
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $('#search_minion').multiselect({
+        search: {
+            left: '<input type="text" name="q" class="form-control" placeholder="Search..." />',
+            right: '<input type="text" name="q" class="form-control" placeholder="Search..." />',
+        }
+    });
+});
+
+document.getElementById("id_name").focus();
+</script>
+
+    <!-- validator -->
+    <script>
+      // initialize the validator function
+      validator.message.date = 'not a real date';
+
+      // validate a field on "blur" event, a 'select' on 'change' event & a '.reuired' classed multifield on 'keyup':
+      $('form')
+        .on('blur', 'input[required], input.optional, select.required', validator.checkField)
+        .on('change', 'select.required', validator.checkField)
+        .on('keypress', 'input[required][pattern]', validator.keypress);
+
+      $('.multi.required').on('keyup blur', 'input', function() {
+        validator.checkField.apply($(this).siblings().last()[0]);
+      });
+
+      $('form').submit(function(e) {
+        e.preventDefault();
+        var submit = true;
+
+        // evaluate the form using generic validaing
+        if (!validator.checkAll($(this))) {
+          submit = false;
+        }
+
+        if (submit) {
+            $("#search_minion_to option[name='minion']").each(function(i){
+            if(this.value){
+            $("#minion_sel").append("<option selected='selected' value='"+this.value+"'>"+this.text+"</option>");
+            }
+            });
+            $("#search_minion option[name='minion_select']").each(function(i){
+            if(this.value){
+            $("#minion_del").append("<option selected='selected' value='"+this.value+"'>"+this.text+"</option>");
+            }
+            });
+            this.submit();
+        }
+
+        return false;
+      });
+    </script>
+    <!-- /validator -->
+
+{% endblock %}
+

@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load myinclusion %}
+{% block css %}
+<!-- iCheck -->
+<link href="/static/css/green.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>{{ page_name }}<small>|&nbsp;<a href="{% url 'module_list' %}">模块管理</a></small></h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                            </li>
+                            <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#">Settings 1</a>
+                                </li>
+                                <li><a href="#">Settings 2</a>
+                                </li>
+                            </ul>
+                            </li>
+                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                            </li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+
+                        <form onsubmit="return fileCheck();" class="form-horizontal form-border" method="post" action="" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% if perms.deploy.edit_module %}
+                            <fieldset>
+                            {% else %}
+                            <fieldset disabled="disabled">
+                            {% endif %}
+                            {% for i in form %}
+                            <div class="item form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12">{{ i.label_tag }} <span class="required">*</span>
+                                </label>
+                                <div class="col-md-6 col-sm-6 col-xs-12 inradio">
+                                    {% if forloop.counter == 3 %}
+                                    <a href="javascript:;" class="file">
+                                        {{ i }}
+                                        {{ i.errors }}选择模块
+                                    </a>
+                                        <label class="showFileName"></label>
+                                    {% elif forloop.counter == 4 %}
+                                        <fieldset {% if id %}disabled{% endif %}>
+                                        {{ i }}
+                                        {{ i.errors }}
+                                        <div class="user_groups"></div>
+                                        </fieldset>
+
+                                    {% else %}
+                                    {{ i }}
+                                    {{ i.errors }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% if ret %}
+                            <div class="item form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12">返回结果</label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <textarea class="form-control">{{ ret }}</textarea>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="ln_solid"></div>
+                            <div class="form-group">
+                                <div class="col-md-6 col-md-offset-3">
+                                    {% ifequal action 'add' %}
+                                    <button id="send" type="submit" class="btn btn-success">添加</button>
+                                    {% endifequal %}
+                                    {% ifequal action 'edit' %}
+                                    <button id="send" type="submit" class="btn btn-success">更新</button>
+                                    {% endifequal %}
+                                </div>
+                            </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="/static/js/icheck.min.js"></script>
+<script type="text/javascript" src="/static/js/csrf.js"></script>
+<script type="text/javascript">
+$(".file").on("change","input[type='file']",function(){
+    var filePath=$(this).val();
+    var arr=filePath.split('\\');
+    var fileName=arr[arr.length-1];
+    $(".showFileName").html(fileName);
+    }
+);
+
+    function fileCheck() {
+        var filepath = $("input[name='upload_path']").val();
+        var extStart = filepath.lastIndexOf(".");
+        var ext = filepath.substring(extStart, filepath.length).toUpperCase();
+        {% ifequal action 'add' %}
+        if (ext == ""){
+            alert("请选择文件！");
+            return false;
+        }
+        {% endifequal %}
+        if (ext != ".BZ2" && ext != ".GZ" && ext != ".ZIP" && ext != ".SLS" && ext != "") {
+            alert("仅限上传以下格式：.sls文件或.bz2/.gz/.zip压缩包！");
+            return false;
+        }
+        else {
+            file_size = this.files[0].size;
+            var size = file_size / 1024;
+            alert(size);
+            alert(size);
+            if (size > 10240) {
+                alert("上传的图片大小不能超过10M！");
+                return false;
+            } else {
+                var num01 = file_size / 1024;
+                num02 = num01.toFixed(2);
+                $("#fileSize").text(num02 + " KB");
+            }
+        }
+        return true;
+    };
+
+$("#id_upload_path").change(function() {
+        fileCheck();
+        });
+
+function radioChange(p) {
+    var visible = $(p).prev().val();
+    if(visible==1){
+    $.ajax({
+type:"POST",
+url:"{% url 'ajax_user_groups' %}",
+data:{},
+dataType:"html",
+success:function(ret){
+var ret = eval('('+ret+')');
+var html = '';
+for(i in ret){
+    html = html + "<option name='group' value='"+i+"'>"+ret[i]+"</option>";
+}
+html = "<select id='user_group' name='user_group' class='form-control' required='' data-bv-notempty='' data-bv-field='user_group'>" +
+    html + "</select";
+
+    $(".user_groups").html(html);
+}
+})
+    }
+}
+
+{% if id %}
+$("input[name='visible']").attr("disabled","disabled");
+{% endif %}
+
+</script>
+{% endblock %}

@@ -6,7 +6,7 @@
 from configparser import ConfigParser
 
 
-class ConfParser:
+class Conf_Parser:
     def __init__(self, conf_path):
         self.fpath = conf_path  # 配置文件路径,要求是绝对路径
         self.cf = ConfigParser()  # ConfigParser对象实例
@@ -52,7 +52,7 @@ class ConfParser:
 
 if __name__ == '__main__':
     config_file = 'devops/config_demo.conf'
-    cp = ConfParser(config_file)
+    cp = Conf_Parser(config_file)
     print(cp.sections())
     print(cp.items('CmdWindow'))
     print(cp.options('CmdWindow'))
