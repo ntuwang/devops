@@ -1,4 +1,9 @@
-# devops
+# devops (持续更新中)
+
+demo
+地址 http://devops.dev4ops.cn/
+用户名 wc
+密码 ASDasd!@#123
 
 #### 项目介绍
 devops 自动化运维平台--一站式满足需求
