@@ -4,6 +4,7 @@
     {{ block.super }}
     <link href="/static/others/css/bootstrapValidator.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/vendors/bootstrap-select/css/bootstrap-select.min.css">
+    <!-- iCheck -->
 {% endblock %}
 {% block content %}
     <div class="right_col" role="main">
@@ -16,7 +17,7 @@
 
                         <div class="x_panel" style="border-top:none;">
                             <div class="x_title">
-                                <h2>文件管理 </h2>
+                                <h2>远程管理 </h2>
                                 <ul class="nav navbar-right panel_toolbox">
                                     <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                     </li>
@@ -37,13 +38,11 @@
                             </div>
                             <div class="x_content">
                                 <div class="loading"></div>
-
                                 <div class="tab-content">
                                     <div class="tab-pane active" id="panel-single">
-                                        <form class="form-horizontal form-border" enctype="multipart/form-data"
-                                              id="id_form">
+                                        <form class="form-horizontal form-border" enctype="multipart/form-data">
                                             {% csrf_token %}
-                                            {% if perms.deploy.edit_fileupload %}
+                                            {% if perms.deploy.edit_deploy %}
                                                 <fieldset>
                                             {% else %}
                                                 <fieldset disabled="disabled">
@@ -64,46 +63,25 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="form-group">
-                                                <label class="control-label col-md-3 col-sm-3 col-xs-12"
-                                                       for="first-name">远程路径<span class="required">*</span>
-                                                </label>
-                                                <div class="col-md-6 col-sm-6 col-xs-12">
-                                                    <input type="text" id="first-name" required="required"
-                                                           class="form-control col-md-7 col-xs-12">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="control-label col-md-3 col-sm-3 col-xs-12"
-                                                       for="id_file_path">选择文件<span class="required">*</span>
-                                                </label>
-                                                <div class="col-md-6 col-sm-6 col-xs-12">
-                                                    <input class="form-control col-md-7 col-xs-12" id="id_file_path"
-                                                           name="file_path" type="file"/>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="control-label col-md-3 col-sm-3 col-xs-12"
-                                                       for="last-name">备注<span class="required">*</span>
-                                                </label>
-                                                <div class="col-md-6 col-sm-6 col-xs-12">
-                                                    <input type="text" id="last-name" name="last-name"
-                                                           required="required" class="form-control col-md-7 col-xs-12">
-                                                </div>
-                                            </div>
-
                                             <div class="item form-group">
-                                                <label class="control-label col-md-3 col-sm-3 col-xs-12">返回结果
+                                                <label class="control-label col-md-3 col-sm-3 col-xs-12">远程命令 <span
+                                                        class="required">*</span>
                                                 </label>
                                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                                    <textarea class="form-control" name="result"
-                                                              rows="10">{{ ret }}</textarea>
+                                                    <input type="text" class="form-control" id="esingle" name="arg"
+                                                           value="{{ arg }}" required="required">
                                                 </div>
                                             </div>
                                             <div class="ln_solid"></div>
                                             <div class="form-group">
                                                 <div class="col-md-6 col-md-offset-3">
-                                                    <input type="submit" name="send" class="btn btn-success" value="提交">
+                                                    {#                                                <input type="submit" name="send" class="btn btn-success" value="提交">#}
+                                                    <span class="esingle">
+                                                <a href="#"
+                                                   name="panel-single" role="button" class="btn btn-success">运行</a>
+                                                </span>
+                                                    <a href="#" onclick="show_result();" role="button"
+                                                       class="btn btn-info">查看结果</a>
                                                 </div>
                                             </div>
                                             </fieldset>
@@ -114,6 +92,35 @@
                             </div>
                         </div>
                     </div>
+
+                    <div id="result"></div>
+                    <!-- 模态框（Modal） -->
+                    <div class="modal fade" id="result-modal-salt" tabindex="-1" role="dialog"
+                         aria-labelledby="result-modal" aria-hidden="true">
+                        <div class="modal-loading"></div>
+                        <div class="modal-dialog">
+                            <div class="modal-content" style="background-color:#272822;color:#00ff00;">
+                                <div class="modal-header" style="border-bottom:1px solid #666">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                        &times;
+                                    </button>
+                                    <b class="modal-title" id="result-modal" style="color:#f8f8f2">运行结果</b>&nbsp;
+                                    <a href="#"   role="button"
+                                       class="btn btn-dark btn-xs">重新查询</a>
+                                    <a href="#" onclick="collapse(this);" state="0" role="button"
+                                       class="btn btn-dark btn-xs">展开所有</a>
+                                </div>
+                                <div id="modal-body" class="modal-body">
+                                    <div class="panel-group" id="accordion">
+                                    </div>
+                                </div>
+                                <!--<div class="modal-footer">
+
+                                </div>-->
+                            </div><!-- /.modal-content -->
+                        </div><!-- /.modal-dialog -->
+                    </div><!-- /.modal -->
+
                     <input type="hidden" class="form-control" value="" id="jid">
                     <input type="hidden" class="form-control" value="" id="exec_type">
 
@@ -128,65 +135,12 @@
     <script src="/static/others/js/bootstrapValidator.min.js"></script>
     <script src="/static/vendors/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script>
-
         $(document).ready(function () {
-
             $('.selectpicker').selectpicker({
                 noneSelectedText: '======请选择=====' //默认显示内容
             });
 
-            $("#id_form").bootstrapValidator({
-                fields: {
-                    tgt_select: {
-                        validators: {
-                            notEmpty: {
-                                message: '请选择主机'
-                            }
-                        }
-                    },
-                    remote_path: {
-                        validators: {
-                            notEmpty: {
-                                message: '请填写远程路径'
-                            }
-                        }
-                    },
-                    file_path: {
-                        validators: {
-                            notEmpty: {
-                                message: '请选择文件'
-                            },
-                            file: {
-                                extension: 'zip,gz,bz2,sls,txt,html,conf,lua,sh,py',
-                                message: '不支持该类型文件上传'
-                            }
-                        }
-                    }
-                }
-            })
-
         });
 
-
-        {% comment %}$(function () {
-            $("#panel-group select[name='tgt_select']").bind("change", function () {
-                var tgt_select = $("#panel-group select[name='tgt_select']").val();
-                if (tgt_select != "") {
-                    $.ajax({
-                        type: "POST",
-                        url: "{% url 'ajax_minions' %}",
-                        data: {tgt_select: tgt_select},
-                        dataType: "html",
-                        success: function (ret) {
-                            var ret = eval('(' + ret + ')');
-                            var html = "<label class=\"control-label col-md-3 col-sm-3 col-xs-12\">包含主机</label><div class=\"col-md-6 col-sm-6 col-xs-12\"><fieldset disabled><textarea class=\"form-control\">" + ret + "</textarea></fieldset></div>";
-                            $("#panel-group div[name='group_minions']").html(html);
-                        }
-                    })
-                } else {
-                    $("#panel-group div[name='group_minions']").html("");
-                }
-            })
-        }){% endcomment %}
     </script>
 {% endblock %}
