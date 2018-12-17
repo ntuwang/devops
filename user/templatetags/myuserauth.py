@@ -29,7 +29,7 @@ def show_users(aid, value):
     return {'users_dict': users_dict, 'select_users_dict': select_users_dict}
 
 
-register.inclusion_tag('user/tag_users.html')(show_users)
+register.inclusion_tag('tags/tag_users.html')(show_users)
 
 
 def show_minions(aid, arg):
@@ -55,4 +55,4 @@ def show_minions(aid, arg):
     return {'minions': sorted(minions.items()), 'select_minions_dict': sorted(select_minions_dict.items())}
 
 
-register.inclusion_tag('user/tag_minions.html')(show_minions)
+register.inclusion_tag('tags/tag_minions.html')(show_minions)

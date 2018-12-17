@@ -6,6 +6,9 @@
 from django import template
 from django.db.models import Q
 
+from asset.models import SaltHost, SaltGroup
+from user.models import Users
+
 register = template.Library()
 
 
@@ -15,12 +18,13 @@ def show_groups(pk, user_type):
     '''
     group_dict = {}
     if user_type:
-        group_dict = {i['groupname']:i['nickname'] for i in SaltGroup.objects.values('groupname', 'nickname')}
+        group_dict = {i['groupname']: i['nickname'] for i in SaltGroup.objects.values('groupname', 'nickname')}
     else:
-        d = User.objects.get(pk=pk).department
-        group_dict = {i['groupname']:i['nickname'] for d in User.objects.get(pk=pk).department.all()
+        d = Users.objects.get(pk=pk).department
+        group_dict = {i['groupname']: i['nickname'] for d in Users.objects.get(pk=pk).department.all()
                       for i in d.saltgroup_department_set.values('groupname', 'nickname')}
 
-    return {'group_dict':sorted(list(set(group_dict.items())))}
+    return {'group_dict': sorted(list(set(group_dict.items())))}
+
 
 register.inclusion_tag('tag_user_departments.html')(show_groups)

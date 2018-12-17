@@ -1,0 +1,10 @@
+{% if list_type == 'single' %}
+<select name="tgt_select" class="form-control" required="required">
+    <option name="" value="">请选择</option>
+{% else %}
+<select name="tgt_select" class="form-control" multiple size="4" required="required">
+{% endif %}
+    {% for tgt in tgt_list %}
+    <option name="tgt" value="{{ tgt }}">{{ tgt }}</option>
+    {% endfor %}
+</select>

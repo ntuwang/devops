@@ -146,26 +146,3 @@ class SaltGroup(models.Model):
         )
         verbose_name = u'Salt分组'
         verbose_name_plural = u'Salt分组管理'
-
-
-class ModuleUpload(models.Model):
-    user = models.ForeignKey(Users,on_delete=models.CASCADE)
-    name = models.CharField(max_length=50, unique=True, verbose_name=u'模块名称')
-    module = models.CharField(max_length=50, unique=True, verbose_name=u'调用模块')
-    upload_path = models.FileField(
-        upload_to=user_dir_path,
-        blank=True,
-        verbose_name=u'模块上传')
-    visible = models.IntegerField(default=0, blank=True, null=True, verbose_name=u'可见等级')
-    remark = models.CharField(max_length=255, blank=True, verbose_name=u'备注')
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        default_permissions = ()
-        permissions = (
-            ("edit_module", u"管理Salt模块"),
-        )
-        verbose_name = u'Salt模块'
-        verbose_name_plural = u'Salt模块管理'

@@ -22,4 +22,5 @@ urlpatterns = [
     path(r'', include('user.urls')),
     path(r'asset/', include('asset.urls')),
     path(r'message/', include('message.urls')),
+    path(r'ops/', include('ops.urls')),
 ]

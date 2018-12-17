@@ -1,6 +1,6 @@
 <div class="left_col scroll-view">
     <div class="navbar nav_title" style="border: 0;">
-        <a href="index.html" class="site_title"><i class="fa fa-spinner"></i> <span>DevOps</span></a>
+        <a href="/" class="site_title"><i class="fa fa-spinner"></i> <span>DevOps</span></a>
     </div>
 
     <div class="clearfix"></div>
@@ -29,13 +29,18 @@
                         <li><a href="{% url 'index' %}">主页</a></li>
                     </ul>
                 </li>
+                <li><a><i class="fa fa-cogs"></i> 日常运维 <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                        <li><a href="{% url 'file_manage' %}">文件上传</a>
+                        </li>
+                    </ul>
+                </li>
                 <li><a><i class="fa fa-edit"></i> 资产管理 <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                         <li><a href="{% url 'salt_key_list' %}">salt主机管理</a></li>
                         <li><a href="{% url 'salt_group_list' %}">salt分组管理</a>
                         <li><a href="{% url 'server_info' %}">虚拟机管理</a></li>
-                        <li><a href="{% url 'cloud_asset_list' %}">公有云管理</a>
-                        </li>
+                        <li><a href="{% url 'cloud_asset_list' %}">公有云管理</a></li>
                         <li><a href="{% url 'owner_list' %}">负责人管理</a></li>
                     </ul>
                 </li>

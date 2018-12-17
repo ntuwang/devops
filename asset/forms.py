@@ -55,19 +55,6 @@ class ServerAssetForm(forms.ModelForm):
         }
 
 
-class ModuleForm(forms.ModelForm):
-    class Meta:
-        model = ModuleUpload
-        fields = ('name', 'module', 'upload_path', 'visible', 'remark')
-        widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'module': forms.TextInput(attrs={'class': 'form-control'}),
-            'upload_path': forms.FileInput(),
-            'visible': forms.RadioSelect(choices=VISIBLE_CHOICES, attrs={'class': 'flat'}),
-            'remark': forms.TextInput(attrs={'class': 'form-control'})
-        }
-
-
 class SaltGroupForm(forms.ModelForm):
     class Meta:
         model = SaltGroup
