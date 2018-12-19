@@ -21,6 +21,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path(r'', include('user.urls')),
     path(r'asset/', include('asset.urls')),
+    path(r'salt/', include('saltstack.urls')),
     path(r'message/', include('message.urls')),
     path(r'ops/', include('ops.urls')),
 ]

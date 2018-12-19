@@ -6,7 +6,7 @@
 from django import template
 from django.db.models import Q
 
-from asset.models import SaltHost, SaltGroup
+from saltstack.models import SaltHost, SaltGroup
 from user.models import Users
 
 register = template.Library()
