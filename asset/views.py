@@ -16,6 +16,7 @@ from django.db.models import Q
 from user.views import UserIP
 from asset.forms import *
 from asset.models import *
+from saltstack.models import SaltHost,SaltGroup
 from utils.config_parser import Conf_Parser
 from asset.asset_info import MultipleCollect
 
@@ -24,15 +25,6 @@ try:
 except ImportError:
     import simplejson as json
 
-import time
-import datetime
-import shutil
-import os
-import re
-import tarfile, zipfile
-
-from io import StringIO
-import json
 
 cps = Conf_Parser('conf/settings.conf')
 sapi = SaltApi(url=cps.get('saltstack', 'url'), username=cps.get('saltstack', 'username'),
