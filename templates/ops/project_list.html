@@ -1,0 +1,151 @@
+{% extends 'base/base.html' %}
+{% block stylesheets %}
+    {{ block.super }}
+    <link href="/static/css/dataTables.bootstrap.min.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="clearfix"></div>
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <a href="{% url 'project_add' %}" style="float:left;" class="btn btn-info btn-sm"
+                               role="button" {% if not perms.deploy.edit_deploy %}disabled{% endif %}><i
+                                    class="fa fa-plus"></i></a>
+                            <div class="loading"></div>
+                            <h2>代码发布项目 </h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                       aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="#">Settings 1</a>
+                                        </li>
+                                        <li><a href="#">Settings 2</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <form class="form-horizontal form-border" method="get" action="" name="formName">
+                            <div class="x_content table-responsive" style="border:none">
+                                <table id="datatable" class="table table-striped table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>详细</th>
+                                        <th>项目名称</th>
+                                        <th>web容器</th>
+                                        <th>代码包</th>
+                                        <th>Jenkins任务名</th>
+
+                                        {% if perms.deploy.edit_deploy %}
+                                            <th>操作</th>
+                                        {% endif %}
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for each_project in all_project_list %}
+                                        <tr>
+                                            <td><a href="{% url 'project_list' %}?aid={{ each_project.pk }}"><i
+                                                    class="fa fa-envelope"></i></a></td>
+                                            <td>{{ each_project.name }}</td>
+                                            <td>{{ each_project.app_type }}</td>
+                                            <td>{{ each_project.warslist }}</td>
+                                            <td>{{ each_project.jenkins_name }}</td>
+                                            {% if perms.deploy.edit_deploy %}
+                                                <td>
+                                                    <a href="{% url 'project_manage' aid=each_project.pk action='edit' %}"
+                                                       class="btn btn-success btn-sm" role="button"><i
+                                                            class="fa fa-edit"></i></a>
+                                                    <a href="#" data-toggle="modal"
+                                                       data-target="#reqDelete-{{ each_project.pk }}"
+                                                       class="btn btn-danger btn-sm" role="button"><i
+                                                            class="fa fa-trash-o "></i></a>
+                                                </td>
+                                            {% endif %}
+                                            <!-- 模态框（Modal） -->
+                                            <div class="modal fade" id="reqDelete-{{ each_project.pk }}" tabindex="-1"
+                                                 role="dialog" aria-labelledby="reqDelete" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <button type="button" class="close" data-dismiss="modal"
+                                                                    aria-hidden="true">&times;
+                                                            </button>
+                                                            <h4 class="modal-title" id="reqDelete">提示</h4>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            确认是否删除？
+                                                            <div><br/><strong>{{ each_project.name }}</strong></p></div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-default btn-sm"
+                                                                    data-dismiss="modal">关闭
+                                                            </button>
+                                                            <a style="margin:4px;" class="btn btn-danger btn-sm"
+                                                               href="{% url 'project_manage' aid=each_project.pk action='delete' %}">删除</a>
+                                                        </div>
+                                                    </div><!-- /.modal-content -->
+                                                </div><!-- /.modal-dialog -->
+                                            </div><!-- /.modal -->
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+                        {% comment %}                {% if request.user.is_superuser %}
+                <button name="load_city" class="btn btn-info btn-sm" style="margin-left:5px;">载入城市数据</button>
+                <span>如果机房位置无城市选择，则需加载省市区数据</span>
+                <div id="notice_id"></div>
+                {% endif %}{% endcomment %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script src="/static/js/jquery.dataTables.min.js"></script>
+    <script src="/static/js/dataTables.bootstrap.min.js"></script>
+    <script src="/static/js/csrf.js"></script>
+
+    <!-- Datatables -->
+    {% comment %}<script>
+    $(document).ready(function() {
+            $('#datatable').dataTable();
+            });
+
+$(function(){
+        $("button[name='load_city']").bind("click",function(){
+            $(".loading").show();
+            $.ajax({
+type:"POST",
+url:"{% url 'load_city' %}",
+data:{action:"load_city_data"},
+dataType:"html",
+success:function(ret) {
+$(".loading").hide();
+var html = '<div style="margin-left:5px;margin-top:10px;" class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>省市区数据载入完成...</div>';
+$("#notice_id").html(html);
+//省市区数据导入提示框定时消失
+setTimeout("$('#notice_id').fadeOut()", 3000);
+},
+errors:function(e){
+           alert("error");
+       }
+});
+return false;
+})
+})
+</script>{% endcomment %}
+
+{% endblock %}
