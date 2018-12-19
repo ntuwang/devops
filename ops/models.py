@@ -1,5 +1,6 @@
 from django.db import models
 from user.models import Users
+from asset.models import ServerAsset
 
 # Create your models here.
 
@@ -30,3 +31,37 @@ class Projects(models.Model):
         verbose_name = u'项目'
         verbose_name_plural = u'项目管理'
 
+
+class Deploys(models.Model):
+    BRANCH_LIST = (
+        ('master', 'master'),
+        ('bugfix', 'bugfix'),
+        ('dev', 'dev')
+    )
+    JENKINS_YN = (
+        ('yes', u'构建'),
+        ('no', u'不构建'),
+    )
+    STATUS_LIST = (
+        (0, '失败'),
+        (1, '成功'),
+        (2, '进行中'),
+        (3, '等待'),
+        (4, '回滚成功'),
+        (5, '回滚失败'),
+    )
+    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    project = models.ForeignKey(Projects, verbose_name='发布项目',on_delete=models.CASCADE)
+    host = models.ForeignKey(ServerAsset, blank=True, null=True, verbose_name='目标主机',on_delete=models.CASCADE)
+    packs = models.CharField(max_length=100, blank=True, null=True, verbose_name='代码包')
+    pack_url = models.CharField(max_length=100, blank=True, null=True, verbose_name='代码包路径')
+    branch = models.CharField(max_length=100, blank=True, null=True, choices=BRANCH_LIST, verbose_name='Git分支')
+    jenkinsbd = models.CharField(max_length=10, blank=True, null=True, choices=JENKINS_YN, verbose_name='Jenkins任务')
+    progress = models.IntegerField(default=0, verbose_name='进度')
+    status = models.IntegerField(default=0, choices=STATUS_LIST, verbose_name='状态')
+    comment = models.TextField(blank=True, null=True, verbose_name='评论')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+    updated_at = models.DateTimeField(auto_now_add=True, verbose_name='更新时间')
+
+    def __unicode__(self):
+        return self.project
