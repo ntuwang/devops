@@ -1,0 +1,111 @@
+{% extends 'base/base.html' %}
+{% block css %}
+<link href="/static/css/dataTables.bootstrap.min.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>运行中任务 </h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                            </li>
+                            <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#">Settings 1</a>
+                                </li>
+                                <li><a href="#">Settings 2</a>
+                                </li>
+                            </ul>
+                            </li>
+                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                            </li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div style="margin-left:5px;"><button name="flush" class="btn btn-success">刷新</button></div>
+                    <div class="x_content table-responsive" style="padding-top:10px;border:none">
+                        <div class="loading"></div>
+                        <table id="datatable" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Job ID</th>
+                                    <th>Function</th>
+                                    <th>Target/PID</th>
+                                    <th>Target Type</th>
+                                    <th>Running</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+<script src="/static/js/jquery.dataTables.min.js"></script>
+<script src="/static/js/dataTables.bootstrap.min.js"></script>
+<script src="/static/js/csrf.js"></script>
+<!-- Datatables -->
+<script>
+
+$(function(){
+            $("button[name='flush']").bind("click",function(){
+
+            $(".loading").show();
+            $.ajax({
+type:"POST",
+url:"{% url 'task_running' %}",
+data:{},
+dataType:"html",
+success:function(ret) {
+$(".loading").hide();
+var ret = eval('('+ret+')');
+var tr = "";
+for(i in ret){
+    tr = tr + "<tr id='" + ret[i]['jid'] + "'><td>" + ret[i]['jid'] + "</td><td>" + ret[i]['func'] + "</td><td>" + ret[i]['tgt_pid'] + "</td><td>"
+        + ret[i]['tgt_type'] + "</td><td>" + ret[i]['running'] + "</td><td><a onclick='job_del(this);' href='javascript:void(0);' role='button' class='btn btn-sm btn-danger' name='" + ret[i]['jid'] + "'>停止</a></td></tr>";
+}
+$("#datatable tbody").html(tr);
+},
+errors:function(e){
+           alert("error");
+       }
+});
+return false;
+})
+})
+
+function job_del(obj){
+            jid = $(obj).attr("name");
+            $(".loading").show();
+            $.ajax({
+type:"GET",
+url:"{% url 'task_running' %}?delete&jid=" + jid,
+data:{},
+dataType:"html",
+success:function(ret) {
+$(".loading").hide();
+$("tr[id="+jid+"]").remove();
+},
+errors:function(e){
+           alert("error");
+       }
+});
+return false;
+}
+
+</script>
+<!-- /Datatables -->
+{% endblock %}

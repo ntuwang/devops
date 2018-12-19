@@ -237,3 +237,65 @@ def salt_ajax_minions(request):
                 return HttpResponse(json.dumps(ret))
     else:
         raise Http404
+
+
+
+@login_required
+def salt_task_list(request):
+    '''
+    任务列表
+    '''
+    if request.user.has_perm('userperm.view_message'):
+        if request.method == 'GET':
+            if request.GET.has_key('tid'):
+                tid = request.get_full_path().split('=')[1]
+                log_detail = Message.objects.filter(user=request.user.first_name).filter(id=tid).exclude(
+                    type=u'用户登录').exclude(type=u'用户退出')
+                return render(request, 'saltstack/salt_task_detail.html', {'log_detail': log_detail})
+
+        logs = Message.objects.filter(user=request.user.first_name).exclude(type=u'用户登录').exclude(type=u'用户退出')[:200]
+
+        return render(request, 'saltstack/salt_task_list.html', {'all_logs': logs})
+    else:
+        raise Http404
+
+
+@login_required
+def salt_task_check(request):
+    '''
+    任务查询
+    '''
+    return render(request, 'saltstack/salt_task_check.html', {})
+
+
+@login_required
+def salt_task_running(request):
+    '''
+    获取运行中的任务
+    '''
+    ret = []
+    if request.method == 'POST':
+        if request.user.has_perms(['userperm.view_message', 'deploy.edit_deploy']):
+            if request.is_ajax():
+                rst = sapi.salt_running_jobs()
+                for k, v in rst.items():
+                    dict = {}
+                    dict['jid'] = k
+                    dict['func'] = v['Function']
+                    dict['tgt_type'] = v['Target-type']
+                    dict['running'] = v['Arguments'][0].replace(';echo ":::"$?', '')
+                    str_tgt = ''
+                    for i in v['Running']:
+                        for m, n in i.items():
+                            str_tgt = str_tgt + m + ':' + str(n) + '<br />'
+                    dict['tgt_pid'] = str_tgt
+                    ret.append(dict)
+                return HttpResponse(json.dumps(ret))
+    if request.GET.has_key('delete'):
+        jid = request.GET.get('jid')
+        import subprocess
+        p = subprocess.Popen("salt '*' saltutil.term_job %s" % jid, shell=True, stdout=subprocess.PIPE)
+        out = p.stdout.readlines()
+        return HttpResponse(json.dumps('Job %s killed.' % jid))
+
+    return render(request, 'saltstack/salt_task_running_list.html', {})

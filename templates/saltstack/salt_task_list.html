@@ -1,0 +1,76 @@
+{% extends 'base/base.html' %}
+{% block stylesheets %}
+    {{ block.super }}
+<link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>任务列表 </h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                            </li>
+                            <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#">Settings 1</a>
+                                </li>
+                                <li><a href="#">Settings 2</a>
+                                </li>
+                            </ul>
+                            </li>
+                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                            </li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content table-responsive" style="padding-top:10px;border:none">
+                        <table id="datatable" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>详细</th>
+                                    <th>操作时间</th>
+                                    <th>类别</th>
+                                    <th>操作</th>
+                                    <th>详细信息</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in all_logs %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'task_list' %}?tid={{ i.pk }}"><i class="fa fa-envelope "></i></a>
+                                    </td>
+                                    <td>{{ i.audit_time|date:"Y-m-d H:i:s" }}</td>
+                                    <td>{{ i.type }}</td>
+                                    <td>{{ i.action }}</td>
+                                    <td>{{ i.content|safe|truncatewords:"10" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block javascripts %}
+    {{ block.super }}
+<script src="/static/js/jquery.dataTables.min.js"></script>
+<script src="/static/js/dataTables.bootstrap.min.js"></script>
+<!-- Datatables -->
+<script>
+    $(document).ready(function() {
+            $('#datatable').dataTable();
+            });
+</script>
+<!-- /Datatables -->
+{% endblock %}

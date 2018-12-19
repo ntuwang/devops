@@ -14,4 +14,8 @@ urlpatterns = [
     url(r'^salt_group_manage/delete$', sviews.salt_group_manage, name='salt_group_delete'),
     url(r'^salt_group_manage/(?P<id>\d+)/edit/$', sviews.salt_group_manage, name='salt_group_edit'),
 
+    url(r'^task_list/$', sviews.salt_task_list, name='task_list'),
+    url(r'^task_check/$', sviews.salt_task_check, name='task_check'),
+    url(r'^task_running/$', sviews.salt_task_running, name='task_running'),
+
 ]

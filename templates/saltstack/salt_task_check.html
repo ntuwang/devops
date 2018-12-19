@@ -1,0 +1,126 @@
+{% extends 'base/base.html' %}
+{% load myinclusion %}
+{% block content %}
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>任务查询<small>|&nbsp;<a href="{% url 'task_list' %}">任务列表</a></small></h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                            </li>
+                            <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#">Settings 1</a>
+                                </li>
+                                <li><a href="#">Settings 2</a>
+                                </li>
+                            </ul>
+                            </li>
+                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                            </li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="modal-loading"></div>
+                        <form class="form-horizontal form-border" method="post" action="" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% if perms.deploy.edit_deploy %}
+                            <fieldset>
+                            {% else %}
+                            <fieldset disabled="disabled">
+                            {% endif %}
+                            <div class="item form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12">任务JID</label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <input class="form-control" id="jid" maxlength="50" name="jid" type="text" required="">
+                                </div>
+                            </div>
+
+                            <div name="ajax_result" class="item form-group"></div>
+                            <div class="ln_solid"></div>
+                            <div class="form-group">
+                                <div class="col-md-6 col-md-offset-3">
+                                    <button id="send" type="submit" class="btn btn-success">查询</button>
+                                </div>
+                            </div>
+                            </fieldset>
+                        </form>
+
+                    <div id="result"></div>
+                    <!-- 模态框（Modal） -->
+                    <div class="modal fade" id="result-modal-salt" tabindex="-1" role="dialog" aria-labelledby="result-modal" aria-hidden="true">
+                        <div class="modal-loading"></div>
+                        <div class="modal-dialog">
+                            <div class="modal-content" style="background-color:#272822;color:#00ff00;">
+                                <div class="modal-header" style="border-bottom:1px solid #666">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    <b class="modal-title" id="result-modal" style="color:#f8f8f2">运行结果</b>&nbsp;
+                                </div>
+                                <div id="modal-body" class="modal-body">
+                                    <div class="panel-group" id="accordion">
+                                    </div>
+                                </div>
+                                <!--<div class="modal-footer">
+
+                                </div>-->
+                            </div><!-- /.modal-content -->
+                        </div><!-- /.modal-dialog -->
+                    </div><!-- /.modal -->
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="/static/js/bootstrapValidator.min.js"></script>
+<script src="/static/js/bootstrap-modal-vertical.js"></script>
+<script src="/static/js/csrf.js"></script>
+<script src="/static/js/salt_result.js"></script>
+<script>
+    $(document).ready(function(){
+            $("form").bootstrapValidator({
+fields:{
+jid:{
+validators:{
+notEmpty:{
+message:'请填写任务JID'
+},
+/*stringLength:{
+min:20,
+max:20,
+message:'JID输入错误'
+},*/
+regexp:{
+regexp:/^[0-9]+$/,
+message:'输入错误'
+}
+}
+},
+check_type:{
+validators:{
+notEmpty:{
+message:'请选择任务类型'
+         }
+           }
+           }
+}
+})
+         .on('success.form.bv',function(e){
+            e.preventDefault();
+            var check_type = $("select[name='check_type']").val();
+            result_check(check_type, "{% url 'ajax_result' %}");
+            })
+})
+</script>
+{% endblock %}
