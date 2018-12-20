@@ -1,4 +1,4 @@
-from django.shortcuts import render,get_object_or_404,redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, JsonResponse, StreamingHttpResponse
 from user.models import Users
@@ -6,6 +6,10 @@ from asset.models import ServerAsset
 from ops.models import Projects
 from .forms import *
 from django.forms.models import model_to_dict
+from aliyunsdkcore.client import AcsClient
+from aliyunsdkcore.request import CommonRequest
+from utils.config_parser import Conf_Parser
+import json
 
 
 # Create your views here.
@@ -19,6 +23,7 @@ def file_upload(request):
         return render(request, 'ops/file_upload.html', {'tgt_list': tgt_list})
     else:
         raise Http404
+
 
 @login_required
 def remote_execution(request):
@@ -166,3 +171,40 @@ def code_deploy_progress(request, pk):
     deploy_id = pk
     page_name = '发布详情'
     return render(request, 'code_deploy_progress.html', locals())
+
+
+def aliyun_dns_list(request):
+    cps = Conf_Parser('conf/settings.conf')
+    client = AcsClient(cps.get('aliyun', 'accessKeyId'), cps.get('aliyun', 'accessSecret'), 'cn-hangzhou')
+
+    req = CommonRequest()
+    req.set_accept_format('json')
+    req.set_domain('alidns.aliyuncs.com')
+    req.set_method('POST')
+    req.set_version('2015-01-09')
+    req.set_action_name('DescribeDomainRecords')
+
+    req.add_query_param('DomainName', 'dev4ops.cn')
+    response = client.do_action_with_exception(req)
+    response = str(response, encoding='utf-8')
+    response = json.loads(response)['DomainRecords']['Record']
+
+    for x in response:
+        dr = {
+            'rr': x['RR'],
+            'status': x['Status'],
+            'value': x['Value'],
+            'type': x['Type'],
+            'domainname': x['DomainName'],
+            'ttl': x['TTL']
+        }
+        updated_values = {'rr': x['RR']}
+        DnsRecords.objects.update_or_create(defaults=updated_values, **dr)
+
+    if request.user.has_perm('asset.view_asset'):
+        if request.method == 'GET':
+            dr_list = DnsRecords.objects.all()
+
+            return render(request, 'ops/dns_list.html', {'all_dns_list': dr_list})
+    else:
+        raise Http404

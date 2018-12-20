@@ -16,4 +16,6 @@ urlpatterns = [
     url(r'^(?P<pk>[0-9]+)/progress/$', oviews.code_deploy_progress, name='code_deploy_progress'),
     url(r'^code/view/(?P<aid>\d+)/(?P<action>[\w-]+)/$', oviews.code_deploy_manage, name='code_deploy_manage'),
 
+    url(r'^dns/list/$', oviews.aliyun_dns_list, name='aliyun_dns_list'),
+
 ]

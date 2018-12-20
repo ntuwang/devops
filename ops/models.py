@@ -2,6 +2,7 @@ from django.db import models
 from user.models import Users
 from asset.models import ServerAsset
 
+
 # Create your models here.
 
 
@@ -18,7 +19,7 @@ class Projects(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True, verbose_name=u'创建时间')
     updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True, verbose_name=u'更新时间')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -51,8 +52,8 @@ class Deploys(models.Model):
         (5, '回滚失败'),
     )
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
-    project = models.ForeignKey(Projects, verbose_name='发布项目',on_delete=models.CASCADE)
-    host = models.ForeignKey(ServerAsset, blank=True, null=True, verbose_name='目标主机',on_delete=models.CASCADE)
+    project = models.ForeignKey(Projects, verbose_name='发布项目', on_delete=models.CASCADE)
+    host = models.ForeignKey(ServerAsset, blank=True, null=True, verbose_name='目标主机', on_delete=models.CASCADE)
     packs = models.CharField(max_length=100, blank=True, null=True, verbose_name='代码包')
     pack_url = models.CharField(max_length=100, blank=True, null=True, verbose_name='代码包路径')
     branch = models.CharField(max_length=100, blank=True, null=True, choices=BRANCH_LIST, verbose_name='Git分支')
@@ -63,5 +64,17 @@ class Deploys(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     updated_at = models.DateTimeField(auto_now_add=True, verbose_name='更新时间')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.project
+
+
+class DnsRecords(models.Model):
+    rr = models.CharField(max_length=255, blank=True, null=True)
+    status = models.CharField(max_length=255, blank=True, null=True)
+    value = models.CharField(max_length=5, blank=True, null=True)
+    type = models.CharField(max_length=255, blank=True, null=True)
+    ttl = models.IntegerField(blank=True, null=True)
+    domainname = models.CharField(max_length=64, blank=True, null=True)
+
+    def __str__(self):
+        return self.rr

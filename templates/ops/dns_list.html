@@ -1,0 +1,154 @@
+{% extends 'base/base.html' %}
+{% block stylesheets %}
+    {{ block.super }}
+    <link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="clearfix"></div>
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <h2> 阿里云解析 </h2>
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <a href="#" style="float:left;" class="btn btn-info btn-sm"
+                               role="button" {% if not perms.deploy.edit_deploy %}disabled{% endif %}> 刷新 </a>
+                            <a href="#" style="float:left;" class="btn btn-info btn-sm"
+                               role="button" {% if not perms.deploy.edit_deploy %}disabled{% endif %}> 添加 </a>
+                            <div class="loading"></div>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                       aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="#">Settings 1</a>
+                                        </li>
+                                        <li><a href="#">Settings 2</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <form class="form-horizontal form-border" method="get" action="" name="formName">
+                            <div class="x_content table-responsive" style="border:none">
+                                <table id="datatable" class="table table-striped table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>id</th>
+                                        <th>rr</th>
+                                        <th>status</th>
+                                        <th>value</th>
+                                        <th>type</th>
+                                        <th>ttl</th>
+                                        <th>domainname</th>
+
+                                        {% if perms.deploy.edit_deploy %}
+                                            <th>操作</th>
+                                        {% endif %}
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for each in all_dns_list %}
+                                        <tr>
+                                            <td>{{ each.id }}</td>
+                                            <td>{{ each.rr|truncatechars:1 }}</td>
+                                            <td>{{ each.status }}</td>
+                                            <td>{{ each.value|truncatechars:5 }}</td>
+                                            <td>{{ each.type }}</td>
+                                            <td>{{ each.ttl }}</td>
+                                            <td>{{ each.domainname }}</td>
+                                            {% if perms.deploy.edit_deploy %}
+                                                <td>
+                                                    <a href="{% url 'project_manage' aid=each.pk action='edit' %}"
+                                                       class="btn btn-success btn-sm" role="button"><i
+                                                            class="fa fa-edit"></i></a>
+                                                    <a href="#" data-toggle="modal"
+                                                       data-target="#reqDelete-{{ each.pk }}"
+                                                       class="btn btn-danger btn-sm" role="button"><i
+                                                            class="fa fa-trash-o "></i></a>
+                                                </td>
+                                            {% endif %}
+                                            <!-- 模态框（Modal） -->
+                                            <div class="modal fade" id="reqDelete-{{ each.pk }}" tabindex="-1"
+                                                 role="dialog" aria-labelledby="reqDelete" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <button type="button" class="close" data-dismiss="modal"
+                                                                    aria-hidden="true">&times;
+                                                            </button>
+                                                            <h4 class="modal-title" id="reqDelete">提示</h4>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            确认是否删除？
+                                                            <div><br/><strong>{{ each.name }}</strong></div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-default btn-sm"
+                                                                    data-dismiss="modal">关闭
+                                                            </button>
+                                                            <a style="margin:4px;" class="btn btn-danger btn-sm"
+                                                               href="{% url 'project_manage' aid=each.pk action='delete' %}">删除</a>
+                                                        </div>
+                                                    </div><!-- /.modal-content -->
+                                                </div><!-- /.modal-dialog -->
+                                            </div><!-- /.modal -->
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+                        {% comment %}                {% if request.user.is_superuser %}
+                <button name="load_city" class="btn btn-info btn-sm" style="margin-left:5px;">载入城市数据</button>
+                <span>如果机房位置无城市选择，则需加载省市区数据</span>
+                <div id="notice_id"></div>
+                {% endif %}{% endcomment %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ block.super }}
+    <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+
+    <!-- Datatables -->
+    {% comment %}<script>
+    $(document).ready(function() {
+            $('#datatable').dataTable();
+            });
+
+$(function(){
+        $("button[name='load_city']").bind("click",function(){
+            $(".loading").show();
+            $.ajax({
+type:"POST",
+url:"{% url 'load_city' %}",
+data:{action:"load_city_data"},
+dataType:"html",
+success:function(ret) {
+$(".loading").hide();
+var html = '<div style="margin-left:5px;margin-top:10px;" class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>省市区数据载入完成...</div>';
+$("#notice_id").html(html);
+//省市区数据导入提示框定时消失
+setTimeout("$('#notice_id').fadeOut()", 3000);
+},
+errors:function(e){
+           alert("error");
+       }
+});
+return false;
+})
+})
+</script>{% endcomment %}
+
+{% endblock %}
