@@ -1,6 +1,6 @@
 {% extends "base/base.html" %}
 
-{% block title %} 主页 {% endblock title %}
+{% block title %} Dashboard 2 {% endblock title %}
 
 {% block stylesheets %}
     {{ block.super }}
@@ -8,43 +8,191 @@
 
 {% block content %}
     <div class="right_col" role="main">
-        <!-- top tiles -->
-        <div class="row tile_count">
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                <span class="count_top"><i class="fa fa-user"></i> 用户总量 </span>
-                <div class="count">25</div>
-
+        <div class="">
+            <div class="row top_tiles">
+                <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="tile-stats">
+                        <div class="icon"><i class="fa fa-caret-square-o-right"></i></div>
+                        <div class="count">1</div>
+                        <h3>用户总量</h3>
+                        <p>Lorem ipsum psdea itgum rixt.</p>
+                    </div>
+                </div>
+                <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="tile-stats">
+                        <div class="icon"><i class="fa fa-comments-o"></i></div>
+                        <div class="count">1</div>
+                        <h3>在线用户</h3>
+                        <p>Lorem ipsum psdea itgum rixt.</p>
+                    </div>
+                </div>
+                <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="tile-stats">
+                        <div class="icon"><i class="fa fa-sort-amount-desc"></i></div>
+                        <div class="count">2</div>
+                        <h3>机器总量</h3>
+                        <p>Lorem ipsum psdea itgum rixt.</p>
+                    </div>
+                </div>
+                <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="tile-stats">
+                        <div class="icon"><i class="fa fa-check-square-o"></i></div>
+                        <div class="count">2</div>
+                        <h3>salt agent</h3>
+                        <p>Lorem ipsum psdea itgum rixt.</p>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                <span class="count_top"><i class="fa fa-clock-o"></i> 平均在线时长 </span>
-                <div class="count">100</div>
 
-            </div>
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                <span class="count_top"><i class="fa fa-user"></i> 机器总量 </span>
-                <div class="count green">2</div>
 
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>echarts示例
+                                <small> 各种图</small>
+                            </h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                       aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="#">Settings 1</a>
+                                        </li>
+                                        <li><a href="#">Settings 2</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div class="col-md-6" id="main" style="width: 50%;height:400px;"></div>
+                            <div class="col-md-6" id="main2" style="width: 50%;height:400px;"></div>
+                            <div class="col-md-12" id="main3" style="width: 100%;height:400px;"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                <span class="count_top"><i class="fa fa-user"></i> salt agent数量</span>
-                <div class="count">1</div>
 
-            </div>
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                <span class="count_top"><i class="fa fa-user"></i> 机器关机数量 </span>
-                <div class="count">2</div>
 
-            </div>
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                <span class="count_top"><i class="fa fa-user"></i> xxxxxx </span>
-                <div class="count">7,325</div>
-
-            </div>
         </div>
-        <!-- /top tiles -->
     </div>
 {% endblock content %}
 
 {% block javascripts %}
     {{ block.super }}
+    <!-- Chart.js -->
+    <script src="/static/vendors/echarts/echarts.min.js"></script>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+        var myChart2 = echarts.init(document.getElementById('main2'));
+
+        // 指定图表的配置项和数据
+        // 饼图
+        var option_pie = {
+            title: {
+                text: '用户访问来源',
+                subtext: '纯属虚构',
+                x: 'center'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                data: ['直接访问', '邮件营销', '联盟广告', '视频广告', '搜索引擎']
+            },
+            series: [
+                {
+                    name: '访问来源',
+                    type: 'pie',
+                    radius: '55%',
+                    center: ['50%', '60%'],
+                    data: [
+                        {value: 335, name: '直接访问'},
+                        {value: 310, name: '邮件营销'},
+                        {value: 234, name: '联盟广告'},
+                        {value: 135, name: '视频广告'},
+                        {value: 1548, name: '搜索引擎'}
+                    ],
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+
+        // 柱图
+        var option_bar = {
+            title: {
+                text: '机器分布'
+            },
+            tooltip: {},
+            legend: {
+                data: ['数量']
+            },
+            xAxis: {
+                data: ["A区", "B区", "B区", "C区", "D区", "E区"]
+            },
+            yAxis: {},
+            series: [{
+                name: '销量',
+                type: 'bar',
+                data: [5, 20, 36, 10, 10, 20]
+            }]
+        };
+
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option_pie);
+        myChart2.setOption(option_bar);
+
+        function randomData() {
+            now = new Date(+now + oneDay);
+            value = value + Math.random() * 21 - 10;
+            return {
+                name: now.toString(),
+                value: [
+                    [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
+                    Math.round(value)
+                ]
+            }
+        }
+
+
+        $(function () {
+            var myChart_line = echarts.init(document.getElementById('main3'));
+            option_line = {
+                title: {
+                    text: '网络趋势图'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [{
+                    data: [820, 932, 901, 934, 1290, 1330, 1320],
+                    type: 'line'
+                }]
+            };
+            myChart_line.setOption(option_line);
+        })
+
+
+    </script>
 {% endblock javascripts %}
