@@ -232,3 +232,11 @@ def owner_manage(request, aid=None, action=None):
     else:
         raise Http404
 
+
+@login_required
+def asset_web_ssh(request):
+    cps = Conf_Parser('conf/settings.conf')
+
+    if request.method == 'POST':
+        ret = {"ip": cps.get('webssh', 'ip'), 'port': 22, "username": cps.get('webssh', 'username'), 'password': cps.get('webssh', 'password'), "static": True}
+        return HttpResponse(json.dumps(ret))

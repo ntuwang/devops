@@ -1,6 +1,8 @@
 {% extends 'base/base.html' %}
 {% block title %} 资源列表 {% endblock title %}
 {% block stylesheets %}
+    <link href="/static/webssh/css/xterm.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/webssh/css/fullscreen.min.css" rel="stylesheet" type="text/css"/>
     {{ block.super }}
 {% endblock %}
 {% block content %}
@@ -18,7 +20,7 @@
                                    {% if not perms.asset.edit_asset %}disabled{% endif %}>添加资产</a>
                                 <a href="{% url 'server_info' %}?action=flush" class="btn btn-info btn-sm" role="button"
                                    {% if not perms.asset.edit_asset %}disabled{% endif %}>刷新salt资产信息</a>
-                            {% comment %}
+                                {% comment %}
                                 <button type="submit" class="btn btn-info btn-sm" name="export" value="check">导出
                                 </button>
                                 <button type="submit" class="btn btn-info btn-sm" name="export" value="check_all">全部导出
@@ -63,12 +65,11 @@
                                     {% if perms.asset.edit_asset %}
                                         <td>
                                             <a href="{% url 'server_manage' aid=server.pk action='edit' %}"
-                                               class="btn btn-success btn-sm" role="button"><i
-                                                    class="fa fa-edit"></i></a>
+                                               class="btn btn-success btn-xs" role="button">编辑</a>
                                             <a href="#" data-toggle="modal"
                                                data-target="#reqDelete-{{ server.pk }}"
-                                               class="btn btn-danger btn-sm" role="button"><i
-                                                    class="fa fa-trash-o "></i></a>
+                                               class="btn btn-danger btn-xs" role="button">删除</a>
+                                            <a type="button" class="btn btn-primary btn-xs webssh">终端</a>
                                         </td>
                                     {% endif %}
                                     <div class="modal fade" id="reqDelete-{{ server.pk }}"
@@ -110,5 +111,103 @@
     </div>
 {% endblock %}
 {% block javascripts %}
+    <script src="/static/webssh/js/xterm.min.js"></script>
+    <script src="/static/webssh/js/fullscreen.min.js"></script>
+{#    <script src="/static/vendors/sweetalert/sweetalert.min.js"></script>#}
     {{ block.super }}
+    <script>
+        jQuery(function ($) {
+            $(document).on('click', '.webssh', function (event) {
+
+
+                event.preventDefault();
+
+                var id_a = $(this).parent().parent().attr('id');
+
+                $.ajax({
+                    headers: {"X-CSRFToken": '{{ csrf_token }}'},
+                    url: "/asset/asset-webssh.html",
+                    type: 'POST',
+                    data: {'id': id_a},
+                    success: function (ret) {
+
+                        var obj = JSON.parse(ret);
+                        var ips = obj.ip;
+                        var ports = obj.port;
+                        var usernames = obj.username;
+                        var passwords = obj.password;
+
+                        $.ajax({
+                            url: "http://127.0.0.1:9000/",
+                            type: 'POST',
+                            data: {hostname: ips, port: ports, username: usernames, password: passwords},
+                            crossDomain: true,
+                            success: callback
+                        });
+
+                        function current_geometry() {
+                            cols = parseInt(window.innerWidth / 10);
+                            rows = parseInt(window.innerHeight / 24);
+                            return [cols, rows];
+                        }
+
+
+                        function callback(msg) {
+                            console.log(msg);
+                            if (msg.status) {
+                                alert("遇到错误:" + "[ " + msg.status + " ]" );
+                                // swal("错误", "登陆" + "[ " + msg.status + " ]" + "遇到错误", "error");
+                                return;
+                            }
+
+
+                            var    url = "ws://127.0.0.1:9000/" + 'ws?id=' + msg.id,
+                                socket = new WebSocket(url),
+                                terminal = document.getElementById('#terminal'),
+                                geometry = current_geometry();
+                            term = new Terminal({cursorBlink: true, cols: geometry[0], rows: geometry[1]});
+
+                            console.log(url);
+                            term.on('data', function (data) {
+                                // console.log(data);
+                                socket.send(data);
+                            });
+
+                            socket.onopen = function (e) {
+                                $('.container1').hide();
+                                term.open(terminal, true);
+                                term.toggleFullscreen(true);
+                            };
+
+                            socket.onmessage = function (msg) {
+                                console.log(msg);
+                                term.write(msg.data);
+                            };
+
+                            socket.onerror = function (e) {
+                                console.log(e);
+                            };
+
+                            socket.onclose = function (e) {
+                                console.log(e);
+                                term.destroy();
+                                $('.container1').show();
+                                // status.text(e.reason);
+                            };
+                        }
+
+
+                        $(window).resize(function () {
+                            if (typeof term != "undefined") {
+                                geometry = current_geometry();
+                                term.geometry = geometry;
+                                term.resize(geometry[0], geometry[1]);
+                            }
+                        });
+
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock %}
