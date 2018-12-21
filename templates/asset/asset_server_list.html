@@ -126,7 +126,7 @@
 
                 $.ajax({
                     headers: {"X-CSRFToken": '{{ csrf_token }}'},
-                    url: "/asset/asset-webssh.html",
+                    url: "{% url 'asset_web_ssh' %}",
                     type: 'POST',
                     data: {'id': id_a},
                     success: function (ret) {

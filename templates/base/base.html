@@ -12,19 +12,19 @@
 
         <title>DevOps | {% block title %}{% endblock %}</title>
 
-        {% block stylesheets %}
-            <link rel="shortcut icon" href="/static/images/favicon.ico"/>
+        <link rel="shortcut icon" href="/static/images/favicon.ico"/>
 
-            <!-- Bootstrap -->
-            <link href="/static/vendors/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-            <!-- Font Awesome -->
-            <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-            <!-- bootstrap-daterangepicker -->
-            <link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-            <!-- datatable -->
-            <link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
-            <!-- Custom Theme Style -->
-            <link href="/static/custom/css/custom.css" rel="stylesheet">
+        <!-- Bootstrap -->
+        <link href="/static/vendors/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Font Awesome -->
+        <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+        <!-- bootstrap-daterangepicker -->
+        <link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+        <!-- datatable -->
+        <link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+        <!-- Custom Theme Style -->
+        <link href="/static/custom/css/custom.css" rel="stylesheet">
+        {% block stylesheets %}
         {% endblock stylesheets %}
         <!-- Custom Theme Style -->
         <link href="/static/custom/css/custom.css" rel="stylesheet">
@@ -60,18 +60,19 @@
         </div>
     </div>
 
-    {% block javascripts %}
-        <!-- jQuery -->
-        <script src="/static/vendors/jquery/jquery.min.js"></script>
-        <!-- Bootstrap -->
-        <script src="/static/vendors/bootstrap/js/bootstrap.min.js"></script>
 
-        <!-- bootstrap-daterangepicker -->
-        <script src="/static/vendors/moment/moment.min.js"></script>
-        <script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
-        <!-- datatable -->
-        <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
-        <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <!-- jQuery -->
+    <script src="/static/vendors/jquery/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="/static/vendors/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- bootstrap-daterangepicker -->
+    <script src="/static/vendors/moment/moment.min.js"></script>
+    <script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <!-- datatable -->
+    <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    {% block javascripts %}
     {% endblock %}
     <!-- Custom Theme Scripts -->
     <script src="/static/custom/js/custom.js"></script>

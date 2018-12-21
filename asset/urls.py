@@ -16,6 +16,6 @@ urlpatterns = [
     url(r'^server/add/$', aviews.server_asset_manage, name='server_add'),
     url(r'^cloud/edit/(?P<aid>\d+)/(?P<action>[\w-]+)/$', aviews.cloud_asset_manage, name='cloud_manage'),
 
-    path('asset-webssh.html', aviews.asset_web_ssh, name='asset_web_ssh'),
+    url(r'^asset_web_ssh/$', aviews.asset_web_ssh, name='asset_web_ssh'),
 
 ]

@@ -208,3 +208,10 @@ def aliyun_dns_list(request):
             return render(request, 'ops/dns_list.html', {'all_dns_list': dr_list})
     else:
         raise Http404
+
+
+@login_required
+def web_term(request):
+
+    page_name = '发布详情'
+    return render(request, 'ops/web_term.html', locals())

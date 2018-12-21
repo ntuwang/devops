@@ -1,0 +1,212 @@
+{% extends 'base/base.html' %}
+
+{% block stylesheets %}
+    {{ block.super }}
+    <link href="/static/webssh/img/favicon.png" rel="icon" type="image/png">
+    <link href="/static/webssh/css/xterm.min.css" rel="stylesheet"/>
+    <link href="/static/webssh/css/fullscreen.min.css" rel="stylesheet"/>
+{% endblock %}
+
+{% block content %}
+
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="page-title">
+                <div class="title_left">
+                    <h3>在线终端
+                        <small></small>
+                    </h3>
+                </div>
+            </div>
+
+            <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>主机连接
+                                <small>正确填写连接的主机信息后，可打开web终端</small>
+                            </h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                       aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="#">Settings 1</a>
+                                        </li>
+                                        <li><a href="#">Settings 2</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+
+                            <form class="form-horizontal form-label-left">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label class="control-label col-md-3" for="first-name">主机地址: <span
+                                            class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <input class="form-control" type="text" id="hostname" name="hostname" value=""
+                                               required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-3" for="first-name">主机端口: <span
+                                            class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <input class="form-control" type="number" id="port" name="port"
+                                               value="22" min=1 max=65535>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-3" for="first-name">用户名: <span
+                                            class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <input class="form-control" type="text" id="username" name="username" value="root"
+                                               required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-3" for="first-name">密码: <span
+                                            class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <input class="form-control" type="password" id="password" name="password" value="">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-3" for="first-name">
+                                    </label>
+                                    <div class="col-md-9">
+                                        密码和密钥2选1
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-3" for="first-name">文件: <span
+                                            class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <input class="form-control" type="file" id="privatekey" name="privatekey"
+                                               value="">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                                        <button class="btn btn-primary" type="reset">重置</button>
+                                        <button type="submit" class="btn btn-primary webssh">连接</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block javascripts %}
+    {{ block.super }}
+    <script src="/static/webssh/js/xterm.min.js"></script>
+    <script src="/static/webssh/js/fullscreen.min.js"></script>
+
+    <script>
+        jQuery(function ($) {
+            $(document).on('click', '.webssh', function (event) {
+
+
+                event.preventDefault();
+
+                var ips = $('#hostname').val();
+                var ports = $('#port').val();
+                var usernames = $('#username').val();
+                var passwords = $('#password').val();
+                var privatekey = $('#privatekey').val();
+
+                $.ajax({
+                    url: "http://127.0.0.1:9000/",
+                    type: 'POST',
+                    data: {hostname: ips, port: ports, username: usernames, password: passwords},
+                    crossDomain: true,
+                    success: callback
+                });
+
+                function current_geometry() {
+                    cols = parseInt(window.innerWidth / 10);
+                    rows = parseInt(window.innerHeight / 24);
+                    return [cols, rows];
+                }
+
+
+                function callback(msg) {
+                    console.log(msg);
+                    if (msg.status) {
+                        alert("遇到错误:" + "[ " + msg.status + " ]");
+                        // swal("错误", "登陆" + "[ " + msg.status + " ]" + "遇到错误", "error");
+                        return;
+                    }
+
+
+                    var url = "ws://127.0.0.1:9000/" + 'ws?id=' + msg.id,
+                        socket = new WebSocket(url),
+                        terminal = document.getElementById('#terminal'),
+                        geometry = current_geometry();
+                    term = new Terminal({cursorBlink: true, cols: geometry[0], rows: geometry[1]});
+
+                    console.log(url);
+                    term.on('data', function (data) {
+                        // console.log(data);
+                        socket.send(data);
+                    });
+
+                    socket.onopen = function (e) {
+                        $('.container1').hide();
+                        term.open(terminal, true);
+                        term.toggleFullscreen(true);
+                    };
+
+                    socket.onmessage = function (msg) {
+                        console.log(msg);
+                        term.write(msg.data);
+                    };
+
+                    socket.onerror = function (e) {
+                        console.log(e);
+                    };
+
+                    socket.onclose = function (e) {
+                        console.log(e);
+                        term.destroy();
+                        $('.container1').show();
+                        // status.text(e.reason);
+                    };
+                }
+
+
+                $(window).resize(function () {
+                    if (typeof term != "undefined") {
+                        geometry = current_geometry();
+                        term.geometry = geometry;
+                        term.resize(geometry[0], geometry[1]);
+                    }
+                });
+
+
+            });
+        });
+    </script>
+{% endblock %}

@@ -18,4 +18,6 @@ urlpatterns = [
 
     url(r'^dns/list/$', oviews.aliyun_dns_list, name='aliyun_dns_list'),
 
+    url(r'^web_term/$', oviews.web_term, name='web_term'),
+
 ]
