@@ -1,6 +1,7 @@
 {% extends 'base/base.html' %}
 
 {% block stylesheets %}
+    <link href="/static/vendors/jquery-notifyjs/styles/metro/notify-metro.css" rel="stylesheet">
     {{ block.super }}
 {% endblock %}
 
@@ -130,24 +131,37 @@
 {% endblock %}
 {% block javascripts %}
     {{ block.super }}
-    <script src="/static/vendors/toastr/toastr.min.js"></script>
+    <script src="/static/vendors/jquery-notifyjs/notify.min.js"></script>
+    <script src="/static/vendors/jquery-notifyjs/styles/metro/notify-metro.js"></script>
     <script>
-        toastr.options = {
-            "closeButton": true,
-            "debug": false,
-            "progressBar": true,
-            "preventDuplicates": true,
-            "positionClass": "toast-top-right",
-            "onclick": null,
-            "showDuration": "400",
-            "hideDuration": "1000",
-            "timeOut": "7000",
-            "extendedTimeOut": "1000",
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
-        };
+        function autohidenotify(style, title, text, position) {
+            if (style == "error") {
+                icon = "fa fa-exclamation";
+            } else if (style == "warning") {
+                icon = "fa fa-warning";
+            } else if (style == "success") {
+                icon = "fa fa-check";
+            } else if (style == "info") {
+                icon = "fa fa-question";
+            } else {
+                icon = "fa fa-circle-o";
+            }
+            $.notify({
+                title: title,
+                text: text,
+                image: "<i class='fa fa-warning'></i>"
+            }, {
+                style: 'metro',
+                className: style,
+                globalPosition: position,
+                showAnimation: "show",
+                showDuration: 0,
+                hideDuration: 0,
+                autoHideDelay: 3000,
+                autoHide: true,
+                clickToHide: true
+            });
+        }
 
 
         $(function () {
@@ -162,9 +176,9 @@
                     success: function (data) {
                         var obj = JSON.parse(data);
                         if (obj.status) {
-                            toastr.success("执行成功！")
+                            autohidenotify('success', '连接成功', '请稍等');
                         } else {
-                            toastr.error(obj.error)
+                            autohidenotify('error', '连接失败', obj.error);
                         }
 
                     }
@@ -179,11 +193,12 @@
                     type: 'POST',
                     data: {"status": "stop", "csrfmiddlewaretoken": '{{ csrf_token }}'},
                     success: function (data) {
+
                         var obj = JSON.parse(data);
                         if (obj.status) {
-                            toastr.success("停止成功！")
+                            autohidenotify('success', '停止成功', '请稍等');
                         } else {
-                            toastr.error("停止失败！")
+                            autohidenotify('error', '停止失败', '请稍等');
                         }
 
                     }

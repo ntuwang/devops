@@ -274,7 +274,7 @@ def web_log(request):
             except Exception as e:
                 ret['status'] = False
                 ret['error'] = "错误{0}".format(e)
-            return HttpResponse(json.dumps(ret))
+            return JsonResponse(ret)
         else:
             ret = {'status': True, 'error': None, }
             user = request.user.username
