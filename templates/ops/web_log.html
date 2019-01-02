@@ -44,10 +44,10 @@
                         </div>
                         <div class="x_content">
 
-                            <form class="form-horizontal form-label-left">
+                            <form class="form-horizontal form-label-left" id="cmd_from">
                                 {% csrf_token %}
                                 <div class="form-group">
-                                    <label class="control-label col-md-3" >主机地址: <span
+                                    <label class="control-label col-md-3">主机地址: <span
                                             class="required">*</span>
                                     </label>
                                     <div class="col-md-7">
@@ -57,7 +57,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="control-label col-md-3" >主机端口: <span
+                                    <label class="control-label col-md-3">主机端口: <span
                                             class="required">*</span>
                                     </label>
                                     <div class="col-md-7">
@@ -67,7 +67,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="control-label col-md-3" >用户名: <span
+                                    <label class="control-label col-md-3">用户名: <span
                                             class="required">*</span>
                                     </label>
                                     <div class="col-md-7">
@@ -78,7 +78,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="control-label col-md-3" >密码: <span
+                                    <label class="control-label col-md-3">密码: <span
                                             class="required">*</span>
                                     </label>
                                     <div class="col-md-7">
@@ -88,11 +88,11 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="control-label col-md-3" >文件路径: <span
+                                    <label class="control-label col-md-3">文件路径: <span
                                             class="required">*</span>
                                     </label>
                                     <div class="col-md-7">
-                                        <input class="form-control" type="text" id="username" name="username"
+                                        <input class="form-control" type="text" id="filepath" name="filepath"
                                                value="/var/log/message"
                                                required>
                                     </div>
@@ -100,8 +100,8 @@
 
                                 <div class="form-group">
                                     <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                                        <button class="btn btn-primary" type="reset">重置</button>
-                                        <button id="submit" type="submit" class="btn btn-primary">查看</button>
+                                        <a id="tail" class="btn btn-primary" type="submit">查看</a>
+                                        <a id="tail_stop" class="btn btn-danger" type="submit">不看了,必须点停止</a>
                                     </div>
                                 </div>
                             </form>
@@ -110,10 +110,194 @@
                 </div>
             </div>
         </div>
+        <div class="">
+
+
+            <div class="clearfix"></div>
+            <div class="row">
+
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>日志输出结果
+                            </h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                       aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="#">Settings 1</a>
+                                        </li>
+                                        <li><a href="#">Settings 2</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-content">
+                                    <pre id="output_append"></pre>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
 
 {% endblock %}
 {% block javascripts %}
     {{ block.super }}
+    <script src="/static/vendors/toastr/toastr.min.js"></script>
+    <script>
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "progressBar": true,
+            "preventDuplicates": true,
+            "positionClass": "toast-top-right",
+            "onclick": null,
+            "showDuration": "400",
+            "hideDuration": "1000",
+            "timeOut": "7000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+
+
+        $(function () {
+
+            $(document).on('click', '#tail', function () {
+
+                $.ajax({
+                    url: "#",
+                    timeout: 5000, //超时时间设置，单位毫秒
+                    type: 'POST',
+                    data: $('#cmd_from').serialize(),
+                    success: function (data) {
+                        var obj = JSON.parse(data);
+                        if (obj.status) {
+                            toastr.success("执行成功！")
+                        } else {
+                            toastr.error(obj.error)
+                        }
+
+                    }
+                })
+            });
+
+            $(document).on('click', '#tail_stop', function () {
+
+                $.ajax({
+                    url: "#",
+                    timeout: 5000, //超时时间设置，单位毫秒
+                    type: 'POST',
+                    data: {"status": "stop", "csrfmiddlewaretoken": '{{ csrf_token }}'},
+                    success: function (data) {
+                        var obj = JSON.parse(data);
+                        if (obj.status) {
+                            toastr.success("停止成功！")
+                        } else {
+                            toastr.error("停止失败！")
+                        }
+
+                    }
+                })
+            });
+        });
+
+
+        $(document).ready(function () {
+            CreateWebSocket();
+        });
+
+
+        function CreateWebSocket() {
+            var socket = new WebSocket('ws://' + window.location.host + '/ws/');
+            socket.onmessage = function (message) {
+                var result = JSON.parse(message.data);
+                var status = result.status;
+                var data = result.data;
+                var output_html = '';
+                if (status === 0) {
+                    {#            $('#output_append').empty();#}
+                    output_html = data;
+                } else if (status === 1) {
+                    $('#output_append').empty();
+                    output_html = data;
+                }
+                $("#output_append").prepend(output_html);
+            }
+        }
+
+
+        $(function () {
+            var setting = {
+                view: {
+                    showLine: true,
+                    selectedMulti: false,
+                    dblClickExpand: false
+                },
+
+                data: {
+                    simpleData: {
+                        enable: true,
+                        idKey: "id",
+                        pIdKey: "pId",
+                        rootPId: 0
+                    }
+                },
+
+                callback: {
+                    beforeClick: getCurrentNode,
+                    {#                         onClick : zTreeOnClick#}
+                }
+            };
+
+            $.ajax({
+                url: '#',
+                type: 'get',
+                data: '',
+                dataType: 'json',
+                success: function (data) {
+                    zTreeObj = $.fn.zTree.init($("#ztree4"), setting, data);
+                    zTreeObj.expandAll(true);
+                }
+            });
+        });
+
+        function getCurrentNode(treeId, treeNode) {
+            curNode = treeNode;
+            zTreeOnClick(curNode);
+        }
+
+        function zTreeOnClick(treeNode) {
+
+            if (treeNode.id > 0 && treeNode.id < 10000) {
+                window.location.href = encodeURI('/tasks/tail.html?project=' + treeNode.n)
+            } else {
+                window.location.href = encodeURI('/tasks/tail.html?business=' + treeNode.id + '&project=' + treeNode.pId)
+            }
+            if (treeNode.id == 0) {
+                window.location.href = '#'
+            }
+
+        }
+
+
+    </script>
 
 {% endblock %}

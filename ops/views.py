@@ -10,6 +10,10 @@ from aliyunsdkcore.client import AcsClient
 from aliyunsdkcore.request import CommonRequest
 from utils.config_parser import Conf_Parser
 import json
+from channels.layers import get_channel_layer
+import os
+import paramiko
+from asgiref.sync import async_to_sync
 
 
 # Create your views here.
@@ -216,8 +220,64 @@ def web_term(request):
     page_name = '发布详情'
     return render(request, 'ops/web_term.html', locals())
 
+
+def taillog(request, hostname, port, username, password, private, tail):
+    """
+    执行 tail log 接口
+    """
+    channel_layer = get_channel_layer()
+    user = request.user.username
+    os.environ[user] = "true"
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    if password:
+        ssh.connect(hostname=hostname, port=port, username=username, password=password)
+    else:
+        pkey = paramiko.RSAKey.from_private_key_file("{0}".format(private))
+        ssh.connect(hostname=hostname, port=port, username=username, pkey=pkey)
+    cmd = "tail " + tail
+    stdin, stdout, stderr = ssh.exec_command(cmd, get_pty=True)
+    for line in iter(stdout.readline, ""):
+        print(1,os.environ.get(user))
+        if os.environ.get(user) == 'false':
+            break
+        result = {"status": 0, 'data': line}
+        result_all = json.dumps(result)
+        async_to_sync(channel_layer.group_send)(user, {"type": "user.message", 'text': result_all})
+
+
+
 @login_required
 def web_log(request):
+    if request.method == "GET":
+        page_name = '发布详情'
+        return render(request, 'ops/web_log.html', locals())
+    if request.method == "POST":
+        status = request.POST.get('status', None)
+        if not status:
+            ret = {'status': True, 'error': None, }
 
-    page_name = '发布详情'
-    return render(request, 'ops/web_log.html', locals())
+            filepath = request.POST.get('filepath', None)
+            hostname = request.POST.get('hostname','')
+            port = request.POST.get('port','')
+            username = request.POST.get('username','')
+            password = request.POST.get('password','')
+            private_key = request.POST.get('private_key','')
+
+            if not filepath:
+                ret['status'] = False
+                ret['error'] = "请选择服务器,输入参数及日志地址."
+                return HttpResponse(json.dumps(ret))
+
+            try:
+                taillog(request, hostname, port, username, password,private_key, filepath)
+            except Exception as e:
+                ret['status'] = False
+                ret['error'] = "错误{0}".format(e)
+            return HttpResponse(json.dumps(ret))
+        else:
+            ret = {'status': True, 'error': None, }
+            user = request.user.username
+            os.environ[user] = "false"
+            print(2,os.environ[user])
+            return HttpResponse(json.dumps(ret))
