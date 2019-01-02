@@ -215,3 +215,9 @@ def web_term(request):
 
     page_name = '发布详情'
     return render(request, 'ops/web_term.html', locals())
+
+@login_required
+def web_log(request):
+
+    page_name = '发布详情'
+    return render(request, 'ops/web_log.html', locals())
