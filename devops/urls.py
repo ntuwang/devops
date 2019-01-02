@@ -18,7 +18,7 @@ from django.urls import path, include,re_path
 from django.conf.urls import url
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls,name='admin'),
     path(r'', include('user.urls')),
     path(r'asset/', include('asset.urls')),
     path(r'salt/', include('saltstack.urls')),

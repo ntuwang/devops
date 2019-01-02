@@ -2,6 +2,7 @@
 
 from django.db import models
 from user.models import Users
+import random
 
 
 def user_dir_path(instance, filename):
@@ -53,6 +54,26 @@ class Owners(models.Model):
         verbose_name_plural = u'联系人管理'
 
 
+# 系统登录用户
+class AssetLoginUser(models.Model):
+    username = models.CharField(max_length=64, verbose_name="用户名", default='root', null=True, blank=True)
+    password = models.CharField(max_length=256, blank=True, null=True, verbose_name='密码')
+    private_key = models.FileField(upload_to='upload/privatekey/%Y%m%d{}'.format(random.randint(0, 99999)),
+                                   verbose_name="私钥", null=True, blank=True)
+
+    ps = models.CharField(max_length=10240, verbose_name="备注", null=True, blank=True)
+    ctime = models.DateTimeField(auto_now_add=True, null=True, verbose_name='创建时间', blank=True)
+    utime = models.DateTimeField(auto_now=True, null=True, verbose_name='更新时间', blank=True)
+
+    class Meta:
+        db_table = "AssetLoginUser"
+        verbose_name = "资产用户"
+        verbose_name_plural = '资产用户'
+
+    def __str__(self):
+        return self.username
+
+
 # Create your models here.
 class ServerAsset(models.Model):
     nodename = models.CharField(max_length=50, unique=True, blank=True, null=True, default=None, verbose_name=u'Salt主机')
@@ -61,9 +82,9 @@ class ServerAsset(models.Model):
     public_ip = models.GenericIPAddressField(max_length=15, blank=True, null=True, verbose_name=u"外网IP")
     size = models.CharField(max_length=50, blank=True, null=True, verbose_name=u'规格')
     status = models.CharField(max_length=50, blank=True, null=True, verbose_name=u'状态')
-    manufacturer = models.CharField(max_length=20, blank=True, verbose_name=u'厂商')
+    manufacturer = models.CharField(max_length=50, blank=True, verbose_name=u'厂商')
     productname = models.CharField(max_length=100, blank=True, verbose_name=u'型号')
-    sn = models.CharField(max_length=20, blank=True, verbose_name=u'序列号')
+    sn = models.CharField(max_length=50, blank=True, verbose_name=u'序列号')
     cpu_model = models.CharField(max_length=100, default=None, null=True, verbose_name=u'CPU型号')
     cpu_nums = models.PositiveSmallIntegerField(default=None, null=True, verbose_name=u'CPU线程')
     memory = models.CharField(max_length=20, default=None, blank=True, null=True, verbose_name=u'内存')
@@ -80,6 +101,7 @@ class ServerAsset(models.Model):
     idc = models.CharField(max_length=50, blank=True, verbose_name=u'机房')
     region = models.ForeignKey(Clouds, blank=True, null=True, verbose_name=u'所在区', on_delete=models.CASCADE)
     owner = models.ForeignKey(Owners, blank=True, null=True, verbose_name=u'负责人', on_delete=models.CASCADE)
+    user = models.ForeignKey(AssetLoginUser, blank=True, null=True, verbose_name=u'资产登录用户', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.hostname
@@ -92,3 +114,5 @@ class ServerAsset(models.Model):
         )
         verbose_name = u'主机资产信息'
         verbose_name_plural = u'主机资产信息管理'
+
+

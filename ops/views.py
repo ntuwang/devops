@@ -216,7 +216,6 @@ def aliyun_dns_list(request):
 
 @login_required
 def web_term(request):
-
     page_name = '发布详情'
     return render(request, 'ops/web_term.html', locals())
 
@@ -238,7 +237,7 @@ def taillog(request, hostname, port, username, password, private, tail):
     cmd = "tail " + tail
     stdin, stdout, stderr = ssh.exec_command(cmd, get_pty=True)
     for line in iter(stdout.readline, ""):
-        print(1,os.environ.get(user))
+        print(1, os.environ.get(user))
         if os.environ.get(user) == 'false':
             break
         result = {"status": 0, 'data': line}
@@ -246,23 +245,24 @@ def taillog(request, hostname, port, username, password, private, tail):
         async_to_sync(channel_layer.group_send)(user, {"type": "user.message", 'text': result_all})
 
 
-
 @login_required
 def web_log(request):
     if request.method == "GET":
-        page_name = '发布详情'
-        return render(request, 'ops/web_log.html', locals())
+        hosts = ServerAsset.objects.all()
+        return render(request, 'ops/web_log.html', {"hosts": hosts})
     if request.method == "POST":
         status = request.POST.get('status', None)
         if not status:
             ret = {'status': True, 'error': None, }
 
             filepath = request.POST.get('filepath', None)
-            hostname = request.POST.get('hostname','')
-            port = request.POST.get('port','')
-            username = request.POST.get('username','')
-            password = request.POST.get('password','')
-            private_key = request.POST.get('private_key','')
+            host_id = request.POST.get('host', '')
+            host_obj = ServerAsset.objects.get(id=host_id)
+            ip = host_obj.public_ip
+            port = 22
+            username = host_obj.user.username
+            password = host_obj.user.password
+            private_key = host_obj.user.private_key
 
             if not filepath:
                 ret['status'] = False
@@ -270,7 +270,7 @@ def web_log(request):
                 return HttpResponse(json.dumps(ret))
 
             try:
-                taillog(request, hostname, port, username, password,private_key, filepath)
+                taillog(request, ip, port, username, password, private_key, filepath)
             except Exception as e:
                 ret['status'] = False
                 ret['error'] = "错误{0}".format(e)
@@ -279,5 +279,5 @@ def web_log(request):
             ret = {'status': True, 'error': None, }
             user = request.user.username
             os.environ[user] = "false"
-            print(2,os.environ[user])
+            print(2, os.environ[user])
             return HttpResponse(json.dumps(ret))

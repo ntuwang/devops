@@ -47,43 +47,15 @@
                             <form class="form-horizontal form-label-left" id="cmd_from">
                                 {% csrf_token %}
                                 <div class="form-group">
-                                    <label class="control-label col-md-3">主机地址: <span
+                                    <label class="control-label col-md-3">选择主机: <span
                                             class="required">*</span>
                                     </label>
                                     <div class="col-md-7">
-                                        <input class="form-control" type="text" id="hostname" name="hostname" value=""
-                                               required>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="control-label col-md-3">主机端口: <span
-                                            class="required">*</span>
-                                    </label>
-                                    <div class="col-md-7">
-                                        <input class="form-control" type="number" id="port" name="port"
-                                               value="22" min=1 max=65535>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="control-label col-md-3">用户名: <span
-                                            class="required">*</span>
-                                    </label>
-                                    <div class="col-md-7">
-                                        <input class="form-control" type="text" id="username" name="username"
-                                               value="root"
-                                               required>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="control-label col-md-3">密码: <span
-                                            class="required">*</span>
-                                    </label>
-                                    <div class="col-md-7">
-                                        <input class="form-control" type="password" id="password" name="password"
-                                               value="">
+                                        <select class="form-control" id="host" name="host" required>
+                                            {% for h in hosts %}
+                                                <option value="{{ h.id }}">{{ h.hostname }}</option>
+                                            {% endfor %}
+                                        </select>
                                     </div>
                                 </div>
 
@@ -93,7 +65,7 @@
                                     </label>
                                     <div class="col-md-7">
                                         <input class="form-control" type="text" id="filepath" name="filepath"
-                                               value="/var/log/message"
+                                               value="-f /var/log/messages"
                                                required>
                                     </div>
                                 </div>
