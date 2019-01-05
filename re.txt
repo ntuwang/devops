@@ -7,3 +7,6 @@ pytz==2018.7
 requests==2.21.0
 urllib3==1.24.1
 webssh
+aliyun-python-sdk-core-v3==2.11.1
+aliyunsdkcore==1.0.3
+django-guardian==1.4.9

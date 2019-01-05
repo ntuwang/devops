@@ -8,8 +8,11 @@ demo
    
 密码 ASDasd!@#123
 
-![image](demo.gif)
+![image](demo/demo.gif)
 
+实时日志
+
+![image](demo/tailf.png)
 #### 项目介绍
 devops 自动化运维平台--一站式满足需求
 
