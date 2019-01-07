@@ -320,3 +320,11 @@ function init_DataTables_new() {
     TableManageButtons.init();
 
 };
+
+function init_selectpicker() {
+    $('.selectpicker').selectpicker({
+        'deselectAllText': '全不选',
+        'selectAllText': '全选',
+        noneSelectedText: '======请选择=====' //默认显示内容
+    });
+}
