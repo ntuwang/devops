@@ -1,0 +1,175 @@
+{% extends 'base/base.html' %}
+{% block stylesheets %}
+    {{ block.super }}
+    {{ block.super }}
+    <link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+    <link href="/static/vendors/bootstrap-table/css/bootstrap-table.min.css" rel="stylesheet">
+
+{% endblock %}
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="clearfix"></div>
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <a href="{% url 'project_add' %}" style="float:left;" class="btn btn-info btn-sm"
+                               role="button" {% if not perms.deploy.edit_deploy %}disabled{% endif %}><i
+                                    class="fa fa-plus"></i> 新增</a>
+                            <div class="loading"></div>
+                            <h2> 数据库列表 </h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                       aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="#">Settings 1</a>
+                                        </li>
+                                        <li><a href="#">Settings 2</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <table id="table">
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ block.super }}
+    <script src="/static/vendors/bootstrap-table/js/bootstrap-table.min.js"></script>
+    <script src="/static/vendors/bootstrap-table/js/bootstrap-table-zh-CN.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+            // 初始化表格
+            initTable();
+        });
+
+        function initTable() {
+            $('#table').bootstrapTable({
+                method: 'post', // 向服务器请求方式
+                contentType: "application/x-www-form-urlencoded", // 如果是post必须定义
+                url: '#',
+                striped: true,                      //是否显示行间隔色
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: true,                   //是否显示分页（*）
+                sortable: true,                     //是否启用排序
+                sortOrder: "asc",                   //排序方式
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                      //初始化加载第一页，默认第一页,并记录
+                pageSize: 2,                       //每页的记录行数（*）
+                pageList: [10, 30, 50, 100],        //可供选择的每页的行数（*）
+                search: true,                       //是否显示表格搜索
+                strictSearch: true,                //是否全匹配搜索
+                searchOnEnterKey: true,              //回车键开始搜索
+                showColumns: true,                  //是否显示所有的列（选择显示的列）
+                showRefresh: true,                  //是否显示刷新按钮
+                minimumCountColumns: 2,             //最少允许的列数
+                clickToSelect: true,                //是否启用点击选中行
+                uniqueId: "id",                     //每一行的唯一标识，一般为主键列
+                showToggle: true,                   //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: false,                  //是否显示父子表 那个+号
+                locale: 'zh-CN',                    //本地化
+                toolbar: "#toolbar",                //指明自定义的toolbar
+                queryParamsType: 'limit',
+
+
+                queryParams:    // 请求参数，这个关系到后续用到的异步刷新
+                    function (params) {
+                        return {
+                            limit: params.limit,
+                            offset: params.offset,
+                            search: params.search,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        }
+                    },
+
+                columns: [
+                    {
+                        field: 'id',
+                        title: 'ID'
+
+                    }, {
+                        field: 'db_name',
+                        title: '实例名称',
+                    },
+                    {
+                        field: 'db_ip',
+                        title: '实例地址',
+                    },
+                    {
+                        field: 'db_port',
+                        title: '端口',
+                    },
+                    {
+                        field: 'status',
+                        title: '状态',
+                    },
+                    {
+                        field: 'comment',
+                        title: '描述',
+                    },
+                    {
+                        field: 'ctime',
+                        title: '创建时间',
+                    },
+                    {
+                        field: 'operate',
+                        title: '操作',
+                        formatter: function (value, row, index) {
+                            var x = '<a  id="DeleteJob" class="btn btn-xs btn-danger"><i class="fa fa-close"></i> 删除 </a>';
+                            var y = '<a href="#" id="ModifyJob" class="btn btn-xs btn-warning"><i class="fa fa-edit"></i> 更新 </a>';
+                            return x + y;
+                        },
+                        events: {
+                            'click #DeleteJob': function (e, value, row, index) {
+
+                                $(this).attr('disabled', 'disabled');
+                                $(this).html('Deleting');
+                                $.ajax({
+                                    type: "POST",
+                                    url: "#",
+                                    data: {
+                                        'record_id': row.id,
+                                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                    },
+                                    dataType: 'json',
+                                    beforeSend: function (xhr, settings) {
+                                    },
+                                    success: function (data) {
+                                        if (data.status == "error") {
+                                            alert(data.result_content)
+                                        } else {
+                                            alert(data.result_content);
+                                            location.href = "/permmission/permission_list/";
+                                        }
+                                    }
+                                });
+                            },
+                        },
+                    },
+                ],
+            });
+        }
+
+
+    </script>
+
+{% endblock %}
