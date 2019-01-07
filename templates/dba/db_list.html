@@ -15,7 +15,7 @@
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <div class="x_panel">
                         <div class="x_title">
-                            <a href="{% url 'project_add' %}" style="float:left;" class="btn btn-info btn-sm"
+                            <a href="{% url 'db_add' %}" style="float:left;" class="btn btn-info btn-sm"
                                role="button" {% if not perms.deploy.edit_deploy %}disabled{% endif %}><i
                                     class="fa fa-plus"></i> 新增</a>
                             <div class="loading"></div>
@@ -129,6 +129,9 @@
                     {
                         field: 'ctime',
                         title: '创建时间',
+                        formatter: function (value, row, index) {
+                            return moment(value).format('YYYY-MM-DD HH:mm:ss')
+                        }
                     },
                     {
                         field: 'operate',

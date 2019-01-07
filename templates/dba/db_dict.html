@@ -60,6 +60,7 @@
                                         <select class="form-control selectpicker col-md-8 col-xs-12" id="id_db_select"
                                                 required
                                                 name="db_id" data-live-search="true">
+                                            <option value="">-----选择数据库------</option>
                                             {% for each in record_list %}
                                                 <option value="{{ each.id }}">{{ each.db_name }}</option>
                                             {% endfor %}

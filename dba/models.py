@@ -6,8 +6,8 @@ from django.db import models
 class DBInfo(models.Model):
 
     STATUS_LIST = (
-        ('0', 'online'),
-        ('1', 'offline')
+        (0, 'online'),
+        (1, 'offline')
     )
     db_name = models.CharField(max_length=100, blank=True, null=True, verbose_name='DB名称')
     db_ip = models.GenericIPAddressField(blank=True, null=True, verbose_name='实例IP')
