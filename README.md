@@ -13,6 +13,10 @@ demo
 实时日志
 
 ![image](demo/tailf.gif)
+
+代码部署
+
+![image](demo/codedeploy.gif)
 #### 项目介绍
 devops 自动化运维平台--一站式满足需求
 

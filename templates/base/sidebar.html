@@ -34,7 +34,17 @@
                         <li><a href="{% url 'file_manage' %}">文件上传</a>
                         <li><a href="{% url 'remote_execution' %}">远程命令</a>
                         <li><a href="{% url 'project_list' %}">项目列表</a>
+                            <ul class="nav child_menu">
+                                <li class="sub_menu" style="display: none"><a
+                                        href="{% url 'project_add' %}"></a>
+                                </li>
+                            </ul>
                         <li><a href="{% url 'code_deploy_list' %}">发布项目</a>
+                            <ul class="nav child_menu">
+                                <li class="sub_menu" style="display: none"><a
+                                        href="{% url 'code_deploy_add' %}"></a>
+                                </li>
+                            </ul>
                         <li><a href="{% url 'aliyun_dns_list' %}">阿里云解析</a>
                         <li><a href="{% url 'web_term' %}">web终端</a>
                         <li><a href="{% url 'web_log' %}">web日志</a>
@@ -65,9 +75,9 @@
                     <ul class="nav child_menu">
                         <li><a href="{% url 'salt_key_list' %}">salt主机列表</a></li>
                         <li><a href="{% url 'salt_group_list' %}">salt分组管理</a>
-{#                        <li><a href="{% url 'task_list' %}">任务列表</a></li>#}
+                            {#                        <li><a href="{% url 'task_list' %}">任务列表</a></li>#}
                         <li><a href="{% url 'task_check' %}">salt任务查询</a></li>
-{#                        <li><a href="{% url 'task_running' %}">存活任务</a></li>#}
+                        {#                        <li><a href="{% url 'task_running' %}">存活任务</a></li>#}
                     </ul>
                 </li>
 

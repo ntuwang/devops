@@ -1,0 +1,240 @@
+{% extends 'base/base.html' %}
+{% load myinclusion %}
+{% block css %}
+    <link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="clearfix"></div>
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>{{ page_name }}
+                                <small>|&nbsp;<a href="{% url 'code_deploy_list' %}">发布历史</a></small>
+                            </h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                       aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                </li>
+                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" id="id_content">
+
+                            <form class="form-horizontal form-border" method="post" action=""
+                                  enctype="multipart/form-data">
+                                {% csrf_token %}
+
+
+                                <div class="item form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12"><label
+                                            for="id_project">发布项目:</label>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" id="id_project" name="project" required="required">
+                                            <option value="" selected="selected">---------</option>
+                                            <option value="1">pss</option>
+                                        </select>
+                                        <div style="padding-top:10px;">
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="item form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12"><label
+                                            for="id_project">应用列表:</label>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select multiple="multiple" class="form-control" id="id_pack" name="name_pack"
+                                                required="required">
+                                        </select>
+                                        <div style="padding-top:10px;">
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="item form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12"><label
+                                            for="id_project">SprintNO:</label>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" id="id_sprint" name="name_sprint"
+                                                required="required">
+                                            <option value="" selected="selected">---------</option>
+                                        </select>
+                                        <div style="padding-top:10px;">
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="item form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12"><label
+                                            for="id_project">BuildNO:</label>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" id="id_build" name="name_build"
+                                                required="required">
+                                            <option value="" selected="selected">---------</option>
+                                        </select>
+                                        <div style="padding-top:10px;">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="item form-group" style="display:none">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12"><label
+                                            for="id_branch">Git分支:</label>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" id="id_branch" name="name_branch"
+                                                required="required">
+                                            {#                                            <option value="" selected="selected">---------</option>#}
+                                            <option value="master" selected="selected">master</option>
+                                            <option value="bugfix">bugfix</option>
+                                            <option value="dev">dev</option>
+                                        </select>
+                                        <div style="padding-top:10px;">
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="item form-group" style="display:none">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12"><label for="id_jenkinsbd">Jenkins任务:</label>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" id="id_jenkinsbd" name="name_jenkinsbd"
+                                                required="required">
+                                            {#                                            <option value="" selected="selected">---------</option>#}
+                                            <option value="yes">构建</option>
+                                            <option value="no" selected="selected">不构建</option>
+                                        </select>
+                                        <div style="padding-top:10px;">
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="item form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12"><label
+                                            for="id_host">目标主机:</label>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" id="id_host" name="name_host" required="required">
+                                            <option value="" selected="selected">---------</option>
+                                            <option value="1">wangchao</option>
+                                        </select>
+                                        <div style="padding-top:10px;">
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                {{ hform.as_p }}
+                                <div class="ln_solid"></div>
+                                <div class="form-group">
+                                    <div class="col-md-6 col-md-offset-3">
+                                        {% ifequal action 'add' %}
+                                            <button id="send" type="submit" class="btn btn-success">添加</button>
+                                        {% endifequal %}
+                                        {% ifequal action 'edit' %}
+                                            <button id="send" type="submit" class="btn btn-success">更新</button>
+                                        {% endifequal %}
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript" src="/static/js/bootstrap-datetimepicker.min.js" charset="UTF-8"></script>
+    <script type="text/javascript" src="/static/js/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <!--<script type="text/javascript" src="http://ip.qq.com/js/geo.js"></script>-->
+    {#<script type="text/javascript" src="/static/js/geo.js" charset="UTF-8"></script>#}
+    <script type="text/javascript">
+
+
+        $('#id_contract_date').datetimepicker({
+            //language:  'fr',
+            format: 'yyyy-mm-dd',
+            language: 'zh-CN',
+            weekStart: 1,
+            setStartDate: new Date(),
+            todayBtn: 1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 3,
+            minView: 2,
+            forceParse: 0,
+            showMeridian: 1,
+            pickerPosition: "bottom-left"
+        });
+
+        function refresh_spint() {
+            $("#id_sprint").empty();
+            $.getJSON("/deploy/pc/nginx/?url=http://192.168.20.20/build/software", function (data) {
+                $.each(data['data'], function (i, value) {
+                    $('#id_sprint').append($('<option>').text(value["name"]).attr('value', value["name"]));
+                });
+                console.log(JSON.stringify(data));
+            });
+        }
+
+        function refresh_build(sprint) {
+            $("#id_build").empty();
+            $.getJSON("/deploy/pc/nginx/?url=http://192.168.20.20/build/software/" + sprint, function (data) {
+                $.each(data['data'], function (i, value) {
+                    $('#id_build').append($('<option>').text(value["name"]).attr('value', value["name"]));
+                });
+                console.log(JSON.stringify(data));
+            });
+        }
+
+
+        function refresh_pack(project) {
+            $("#id_pack").empty();
+
+            $.getJSON("/deploy/pack/list/?project=" + project, function (data) {
+                $.each(data['data'], function (i, value) {
+                    $('#id_pack').append($('<option>').text(value).attr('value', value));
+                });
+            });
+        }
+
+        refresh_spint();
+
+        $('#id_sprint').change(function () {
+            var checkText = $("#id_sprint").find("option:selected").text();
+            refresh_build(checkText);
+        });
+
+        $('#id_project').change(function () {
+            var checkText = $("#id_project").find("option:selected").text();
+            refresh_pack(checkText);
+        });
+
+
+    </script>
+{% endblock %}

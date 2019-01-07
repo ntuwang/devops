@@ -165,7 +165,7 @@ def code_deploy_manage(request, aid=None, action=None):
                 return redirect('code_deploy_progress', pk=deploy.id)
         else:
 
-            return render(request, 'code_deploy_manage.html', locals())
+            return render(request, 'ops/code_deploy_manage.html', locals())
     else:
         raise Http404
 
