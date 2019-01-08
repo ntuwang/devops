@@ -10,6 +10,7 @@ from utils.config_parser import Conf_Parser
 import json
 from utils.mydb import MysqlConn
 from .forms import *
+import traceback
 
 
 @login_required
@@ -48,7 +49,7 @@ def db_list(request):
 
 
 @login_required
-def db_dict(request):
+def db_metadata(request):
     """
     cloud列表、cloud详细
     """
@@ -58,7 +59,7 @@ def db_dict(request):
         data = {'record_list': record_list,
                 }
 
-        return render(request, 'dba/db_dict.html',data)
+        return render(request, 'dba/db_metadata.html', data)
 
     elif request.method == 'POST':
         cps = Conf_Parser('conf/settings.conf')
@@ -84,11 +85,12 @@ def db_dict(request):
 
         try:
             # 获取表元数据
-            with MysqlConn(dbinfo.db_ip, dbinfo.db_port, 'information_schema', db_username, db_pass,) as cur:
+
+            with MysqlConn(dbinfo.db_ip, dbinfo.db_port,"information_schema", db_username, db_pass,) as cur:
                 # 获取创建表的语句
                 create_sql = """show create table {0}.{1};""".format(db_name, table_name)
                 cur.execute(create_sql)
-                table_create = cur.fetchone()['Create Table']
+                table_create = cur.fetchone()[1]
 
                 # 获取表统计信息
                 status_sql = """
@@ -140,6 +142,7 @@ def db_dict(request):
                 data['table_status'] = table_status
                 data['table_index'] = table_index
         except Exception as e:
+            traceback.print_exc()
             data['status'] = 1
             data['message'] = '获取表元数据时发生错误.'
 
@@ -148,7 +151,7 @@ def db_dict(request):
             'db_id': db_id,
             'table_name': table_name,
         }
-        return render(request, 'dba/db_dict.html', context)
+        return render(request, 'dba/db_metadata.html', context)
 
 
 @login_required
