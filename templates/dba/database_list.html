@@ -137,8 +137,10 @@
                         field: 'operate',
                         title: '操作',
                         formatter: function (value, row, index) {
-                            var x = '<a  id="DeleteJob" class="btn btn-xs btn-danger"><i class="fa fa-close"></i> 删除 </a>';
-                            var y = '<a href="#" id="ModifyJob" class="btn btn-xs btn-warning"><i class="fa fa-edit"></i> 更新 </a>';
+                            var edit_url = "{% url 'db_manage' action='edit' aid=999999 %}".replace(/999999/,row.id);
+                            var del_url = "{% url 'db_manage' action='delete' aid=999999 %}".replace(/999999/,row.id);
+                            var x = '<a href="' + del_url + '" class="btn btn-xs btn-danger"><i class="fa fa-close"></i> 删除 </a>';
+                            var y = '<a href="' + edit_url + '"  class="btn btn-xs btn-warning"><i class="fa fa-edit"></i> 更新 </a>';
                             return x + y;
                         },
                         events: {

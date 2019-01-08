@@ -174,32 +174,33 @@ def db_manage(request, aid=None, action=None):
     """
     Manage Cloud
     """
-    if request.user.has_perms(['asset.view_asset', 'asset.edit_asset']):
-        dbinfo = DBInfo()
-
-        if request.method == 'GET':
-            form = DBInfoForm(instance=dbinfo)
-            page_name = ''
-            if aid:
-                db_list = get_object_or_404(DBInfo, pk=aid)
-                if action == 'edit':
-                    page_name = '编辑数据库'
-                if action == 'delete':
-                    db_list.delete()
-                    return redirect('project_list')
-            else:
-                action = 'add'
-                page_name = '新增数据库'
-            return render(request, 'dba/db_manage.html', {"form": form, "page_name": page_name, "action": action})
-
-        elif request.method == 'POST':
-            form = DBInfoForm(request.POST, instance=dbinfo)
-
-            if form.is_valid():
-                form.save()
+    page_name = ''
+    if aid:
+        db_list = get_object_or_404(DBInfo, pk=aid)
+        if action == 'edit':
+            page_name = '编辑数据库'
+        if action == 'delete':
+            db_list.delete()
             return redirect('database_list')
     else:
-        raise Http404
+        db_list = DBInfo()
+        action = 'add'
+        page_name = '新增数据库'
+
+    if request.method == 'GET':
+        form = DBInfoForm(instance=db_list)
+        return render(request, 'dba/db_manage.html', {"form": form, "page_name": page_name, "action": action})
+
+    elif request.method == 'POST':
+        form = DBInfoForm(request.POST, instance=db_list)
+
+        if form.is_valid():
+            if action == 'add':
+                form.save()
+
+            elif action == 'edit':
+                form.save()
+        return redirect('database_list')
 
 
 @login_required()

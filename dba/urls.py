@@ -11,6 +11,6 @@ urlpatterns = [
     url(r'^get_table_list/$', dviews.get_table_list, name='get_table_list'),
 
     url(r'^db_add/$', dviews.db_manage, name='db_add'),
-    url(r'^db_edit/(?P<aid>\d+)/(?P<action>[\w-]+)/$', dviews.db_manage, name='db_edit'),
+    url(r'^db_edit/(?P<action>[\w-]+)/(?P<aid>\d+)/$', dviews.db_manage, name='db_manage'),
 
 ]
