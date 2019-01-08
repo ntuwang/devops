@@ -11,17 +11,19 @@ import json
 from utils.mydb import MysqlConn
 from .forms import *
 import traceback
+from collections import OrderedDict
+from django.core.serializers.json import DjangoJSONEncoder
 
 
 @login_required
-def db_list(request):
+def database_list(request):
     """
     cloud列表、cloud详细
     """
 
     if request.method == 'GET':
 
-        return render(request, 'dba/db_list.html')
+        return render(request, 'dba/database_list.html')
 
     elif request.method == 'POST':
         offset = int(request.POST.get('offset'))
@@ -86,11 +88,12 @@ def db_metadata(request):
         try:
             # 获取表元数据
 
-            with MysqlConn(dbinfo.db_ip, dbinfo.db_port,"information_schema", db_username, db_pass,) as cur:
+            with MysqlConn(dbinfo.db_ip, dbinfo.db_port, "information_schema", db_username, db_pass,
+                           cursorclass=1) as cur:
                 # 获取创建表的语句
                 create_sql = """show create table {0}.{1};""".format(db_name, table_name)
                 cur.execute(create_sql)
-                table_create = cur.fetchone()[1]
+                table_create = cur.fetchone()['Create Table']
 
                 # 获取表统计信息
                 status_sql = """
@@ -138,9 +141,21 @@ def db_metadata(request):
                 cur.execute(index_sql)
                 table_index = cur.fetchall()
 
+                columns_sql = """select column_name, 
+                                     column_default, 
+                                     is_nullable, 
+                                     column_type, 
+                                     column_comment, 
+                                     column_key, extra 
+                                 from information_schema.columns 
+                                 where table_schema='{0}' and table_name='{1}';""".format(db_name, table_name)
+                cur.execute(columns_sql)
+                table_columns = cur.fetchall()
+
                 data['table_create'] = table_create
-                data['table_status'] = table_status
+                data['table_status'] = json.dumps(table_status, cls=DjangoJSONEncoder)
                 data['table_index'] = table_index
+                data['table_columns'] = table_columns
         except Exception as e:
             traceback.print_exc()
             data['status'] = 1
@@ -166,35 +181,35 @@ def db_manage(request, aid=None, action=None):
             form = DBInfoForm(instance=dbinfo)
             page_name = ''
             if aid:
-                project_list = get_object_or_404(Projects, pk=aid)
+                db_list = get_object_or_404(DBInfo, pk=aid)
                 if action == 'edit':
-                    page_name = '编辑发布项目'
+                    page_name = '编辑数据库'
                 if action == 'delete':
-                    project_list.delete()
+                    db_list.delete()
                     return redirect('project_list')
             else:
                 action = 'add'
-                page_name = '新增发布项目'
-            return render(request, 'ops/project_manage.html', {"form": form, "page_name": page_name, "action": action})
+                page_name = '新增数据库'
+            return render(request, 'dba/db_manage.html', {"form": form, "page_name": page_name, "action": action})
 
         elif request.method == 'POST':
             form = DBInfoForm(request.POST, instance=dbinfo)
 
             if form.is_valid():
                 form.save()
-            return redirect('db_list')
+            return redirect('database_list')
     else:
         raise Http404
-
 
 
 @login_required()
 def get_table_list(request):
     cps = Conf_Parser('conf/settings.conf')
-    db_id = request.POST.get('db_id','')
+    db_id = request.POST.get('db_id', '')
     dbinfo = DBInfo.objects.get(pk=db_id)
     db_username = cps.get('dba', 'username')
     db_pass = cps.get('dba', 'password')
+    da_name = dbinfo.db_name
     table_list = []
 
     data = {
@@ -205,7 +220,7 @@ def get_table_list(request):
 
     try:
         # 获取表名称
-        with MysqlConn(dbinfo.db_ip, dbinfo.db_port, 'ptolemy', db_username,db_pass) as cur:
+        with MysqlConn(dbinfo.db_ip, dbinfo.db_port, da_name, db_username, db_pass) as cur:
             sql = """show tables;"""
             cur.execute(sql)
             table_list = [table[0] for table in cur.fetchall()]
@@ -221,4 +236,3 @@ def get_table_list(request):
         data['message'] = '获取表名称时发生错误.'
 
     return HttpResponse(json.dumps(data), content_type='application/json')
-

@@ -1,10 +1,14 @@
 import pymysql
+from pymysql.cursors import DictCursor
 
 
 class MysqlConn:
-    def __init__(self, host_ip, port_num, db_name, db_user, db_pass, conn=0):
-        self.connection = pymysql.connect(host=host_ip, port=port_num, user=db_user, passwd=db_pass, db=db_name, charset='utf8')
-
+    def __init__(self, host_ip, port_num, db_name, db_user, db_pass, conn=0,cursorclass=None):
+        if not cursorclass:
+            self.connection = pymysql.connect(host=host_ip, port=port_num, user=db_user, passwd=db_pass, db=db_name, charset='utf8')
+        else:
+            self.connection = pymysql.connect(host=host_ip, port=port_num, user=db_user, passwd=db_pass, db=db_name,
+                                              charset='utf8',cursorclass=DictCursor)
         self.cursor = self.connection.cursor()
         self.conn = conn
 

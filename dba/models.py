@@ -11,7 +11,7 @@ class DBInfo(models.Model):
     )
     db_name = models.CharField(max_length=100, blank=True, null=True, verbose_name='DB名称')
     db_ip = models.GenericIPAddressField(blank=True, null=True, verbose_name='实例IP')
-    db_port = models.IntegerField(default=22, verbose_name='实例端口')
+    db_port = models.IntegerField(default=3306, verbose_name='实例端口')
     status = models.IntegerField(default=0, choices=STATUS_LIST, verbose_name='实例状态')
     comment = models.TextField(blank=True, null=True, verbose_name='描述')
     ctime = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')

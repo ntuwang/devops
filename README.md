@@ -17,6 +17,10 @@ demo
 代码部署
 
 ![image](demo/codedeploy.gif)
+
+数据库管理
+
+![image](demo/database.gif)
 #### 项目介绍
 devops 自动化运维平台--一站式满足需求
 

@@ -6,7 +6,7 @@ from dba import views as dviews
 
 urlpatterns = [
 
-    url(r'^db_list/$', dviews.db_list, name='db_list'),
+    url(r'^database_list/$', dviews.database_list, name='database_list'),
     url(r'^db_metadata/$', dviews.db_metadata, name='db_metadata'),
     url(r'^get_table_list/$', dviews.get_table_list, name='get_table_list'),
 
