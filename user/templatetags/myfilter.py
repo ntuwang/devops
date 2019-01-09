@@ -39,3 +39,13 @@ def all_users(group):
         return all_users
     except:
         return ''
+
+@register.filter(name='is_super')
+def user_is_super(pk):
+    '''
+    是否为超级用户
+    '''
+    if pk:
+        return Users.objects.get(pk=pk).is_superuser
+    else:
+        return None

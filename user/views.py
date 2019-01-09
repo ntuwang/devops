@@ -140,11 +140,16 @@ def user_manage(request, aid=None, action=None):
             if form.is_valid():
                 password1 = request.POST.get('password1')
                 password2 = request.POST.get('password2')
+                perm_select = request.POST.getlist('perm_sel')
+                perm_delete = request.POST.getlist('perm_del')
                 if action == 'add' or action == 'edit':
                     form.save()
                     if password1 and password1 == password2:
                         user.set_password(password1)
                     user.save()
+                    # 授予用户权限
+                    user.user_permissions.add(*perm_select)
+                    user.user_permissions.remove(*perm_delete)
                     Message.objects.create(type=u'用户管理', user=request.user, action=page_name, action_ip=UserIP(request),
                                                content=u'%s %s%s，用户名 %s' % (
                                                page_name, user.last_name, user.first_name, user.username))

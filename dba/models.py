@@ -24,3 +24,7 @@ class DBInfo(models.Model):
         ordering = ['-id']
         verbose_name = u'数据库'
         verbose_name_plural = u'DB管理'
+        permissions = (
+            ('view_db', u'查看DB'),
+            ('manage_db', u'管理DB')
+        )

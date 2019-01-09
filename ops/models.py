@@ -67,6 +67,15 @@ class Deploys(models.Model):
     def __str__(self):
         return self.project
 
+    class Meta:
+        default_permissions = ()
+        permissions = (
+            ('view_deploy', u'查看部署'),
+            ('manage_deploy', u'管理部署')
+        )
+        ordering = ['-id']
+        verbose_name = u'部署'
+
 
 class DnsRecords(models.Model):
     rr = models.CharField(max_length=255, blank=True, null=True)
@@ -78,3 +87,12 @@ class DnsRecords(models.Model):
 
     def __str__(self):
         return self.rr
+
+    class Meta:
+        default_permissions = ()
+        permissions = (
+            ('view_dns', u'查看DNS'),
+            ('manage_dns', u'管理DNS')
+        )
+        ordering = ['-id']
+        verbose_name = u'域名解析'

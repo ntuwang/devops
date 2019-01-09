@@ -8,7 +8,7 @@ urlpatterns = [
     url(r'^$', uviews.index, name='index'),
     url(r'^accounts/login/$', uviews.login, name='login'),
     url(r'^accounts/logout/$', uviews.logout, {'next_page': '/'}, name='logout'),
-    url(r'^userauth/user/list/$', uviews.user_list, name='user_list'),
-    url(r'^userauth/user/add/$', uviews.user_manage, name='user_add'),
-    url(r'^userauth/user/edit/(?P<aid>\d+)/(?P<action>[\w-]+)/$', uviews.user_manage, name='user_manage'),
+    url(r'^user/list/$', uviews.user_list, name='user_list'),
+    url(r'^user/add/$', uviews.user_manage, name='user_add'),
+    url(r'^user/manage/(?P<action>[\w-]+)/(?P<aid>\d+)/$', uviews.user_manage, name='user_manage'),
 ]

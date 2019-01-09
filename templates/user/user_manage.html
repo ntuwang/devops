@@ -2,165 +2,188 @@
 {% load myfilter %}
 {% load myuserauth %}
 {% block content %}
-<div class="right_col" role="main">
-    <div class="">
-        <div class="clearfix"></div>
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="clearfix"></div>
 
-        <div class="row">
-            <div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="x_panel">
-                    <div class="x_title">
-                        <h2>{{ page_name }}<small>|&nbsp;<a href="{% url 'user_list' %}">查看用户</a></small></h2>
-                        <ul class="nav navbar-right panel_toolbox">
-                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                            </li>
-                            <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                            <ul class="dropdown-menu" role="menu">
-                                <li><a href="#">Settings 1</a>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>{{ page_name }}
+                                <small>|&nbsp;<a href="{% url 'user_list' %}">查看用户</a></small>
+                            </h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                 </li>
-                                <li><a href="#">Settings 2</a>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                       aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="#">Settings 1</a>
+                                        </li>
+                                        <li><a href="#">Settings 2</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><a class="close-link"><i class="fa fa-close"></i></a>
                                 </li>
                             </ul>
-                            </li>
-                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                            </li>
-                        </ul>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="x_content">
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
 
-                        <form class="form-horizontal form-border" method="post" action="" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            {% for i in form %}
-                            <div class="item form-group">
-                                <label class="control-label col-md-2 col-sm-2 col-xs-12" style="text-align:left;">{{ i.label_tag }}
-                                </label>
-                                <div class="col-md-6 col-sm-6 col-xs-12">
-                                    {{ i }}
-                                    <div style="padding-top:10px;">
-                                    {{ i.errors }}
+                            <form class="form-horizontal form-border" method="post" action=""
+                                  enctype="multipart/form-data">
+                                {% csrf_token %}
+                                {% for i in form %}
+                                    <div class="item form-group">
+                                        <label class="control-label col-md-2 col-sm-2 col-xs-12"
+                                               style="text-align:left;">{{ i.label_tag }}
+                                        </label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            {{ i }}
+                                            <div style="padding-top:10px;">
+                                                {{ i.errors }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                <div class="item form-group">
+                                    <label class="control-label col-md-2 col-sm-2 col-xs-12" style="text-align:left;">密码:
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input class="form-control" id="password1" name="password1" type="password"
+                                               data-validate-length-range="8,20"
+                                               {% ifequal action 'add' %}required="required"{% endifequal %}>
                                     </div>
                                 </div>
-                            </div>
-                            {% endfor %}
-                            <div class="item form-group">
-                                <label class="control-label col-md-2 col-sm-2 col-xs-12" style="text-align:left;">密码:
-                                </label>
-                                <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <input class="form-control" id="password1" name="password1" type="password"
-                                    data-validate-length-range="8,20" {% ifequal action 'add' %}required="required"{% endifequal %}>
+                                <div class="item form-group">
+                                    <label class="control-label col-md-2 col-sm-2 col-xs-12" style="text-align:left;">重复密码:
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input class="form-control" id="password2" name="password2" type="password"
+                                               data-validate-linked="password1"
+                                               {% ifequal action 'add' %}required="required"{% endifequal %}>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="item form-group">
-                                <label class="control-label col-md-2 col-sm-2 col-xs-12" style="text-align:left;">重复密码:
-                                </label>
-                                <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <input class="form-control" id="password2" name="password2" type="password"
-                                    data-validate-linked="password1" {% ifequal action 'add' %}required="required"{% endifequal %}>
-                                </div>
-                            </div>
-                            <div class="ln_solid"></div>
 
-                            <div class="ln_solid"></div>
-
-                            <div class="ln_solid"></div>
-                            <select hidden="hidden" id="group_sel" name="group_sel" size="8" multiple="multiple"></select>
-                            <select hidden="hidden" id="group_del" name="group_del" size="8" multiple="multiple"></select>
-                            <select hidden="hidden" id="perm_sel" name="perm_sel" size="8" multiple="multiple"></select>
-                            <select hidden="hidden" id="perm_del" name="perm_del" size="8" multiple="multiple"></select>
-                            <div class="form-group">
-                                <div>
-                                    {% ifequal action 'add' %}
-                                    <button id="send" type="submit" class="btn btn-success">添加</button>
-                                    {% endifequal %}
-                                    {% ifequal action 'edit' %}
-                                    <button id="send" type="submit" class="btn btn-success">更新</button>
-                                    {% endifequal %}
+                                <div class="ln_solid"></div>
+                                <div id="show_perm" class="row">
+                                    {% if aid|is_super %}
+                                        <fieldset disabled>{% else %}
+                                        <fieldset>{% endif %}
+                                    {% show_permissions aid 'user' %}
+                                    </fieldset>
                                 </div>
-                            </div>
-                        </form>
+
+
+                                <select hidden="hidden" id="perm_sel" name="perm_sel" size="8"
+                                        multiple="multiple"></select>
+                                <select hidden="hidden" id="perm_del" name="perm_del" size="8"
+                                        multiple="multiple"></select>
+                                <div class="form-group">
+                                    <div>
+                                        {% ifequal action 'add' %}
+                                            <button id="send" type="submit" class="btn btn-success">添加</button>
+                                        {% endifequal %}
+                                        {% ifequal action 'edit' %}
+                                            <button id="send" type="submit" class="btn btn-success">更新</button>
+                                        {% endifequal %}
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
+
 {% endblock %}
 
-{% block js %}
-<!-- validator -->
-<script type="text/javascript" src="/static/js/validator.min.js"></script>
-<script type="text/javascript" src="/static/js/multiselect.min.js"></script>
-<script type="text/javascript">
-jQuery(document).ready(function($) {
-    $('#search').multiselect({
-        search: {
-            left: '<input type="text" name="q" class="form-control" placeholder="Search..." />',
-            right: '<input type="text" name="q" class="form-control" placeholder="Search..." />',
-        }
-    });
-    $('#search_group').multiselect({
-        search: {
-            left: '<input type="text" name="q" class="form-control" placeholder="Search..." />',
-            right: '<input type="text" name="q" class="form-control" placeholder="Search..." />',
-        }
-    });
-});
+{% block javascripts %}
+    <!-- validator -->
+    <script type="text/javascript" src="/static/others/js/validator.min.js"></script>
+    <script type="text/javascript" src="/static/others/js/multiselect.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function ($) {
 
-document.getElementById("id_username").focus();
-</script>
+            $('#search').multiselect({
+                search: {
+                    left: '<input type="text" name="q" class="form-control" placeholder="Search..." />',
+                    right: '<input type="text" name="q" class="form-control" placeholder="Search..." />',
+                }
+            });
+
+        });
+
+        document.getElementById("id_username").focus();
+    </script>
 
     <!-- validator -->
     <script>
-      // initialize the validator function
-      validator.message.date = 'not a real date';
+        // initialize the validator function
+        validator.message.date = 'not a real date';
 
-      // validate a field on "blur" event, a 'select' on 'change' event & a '.reuired' classed multifield on 'keyup':
-      $('form')
-        .on('blur', 'input[required], input.optional, select.required', validator.checkField)
-        .on('change', 'select.required', validator.checkField)
-        .on('keypress', 'input[required][pattern]', validator.keypress);
+        // validate a field on "blur" event, a 'select' on 'change' event & a '.reuired' classed multifield on 'keyup':
+        $('form')
+            .on('blur', 'input[required], input.optional, select.required', validator.checkField)
+            .on('change', 'select.required', validator.checkField)
+            .on('keypress', 'input[required][pattern]', validator.keypress);
 
-      $('.multi.required').on('keyup blur', 'input', function() {
-        validator.checkField.apply($(this).siblings().last()[0]);
-      });
+        $('.multi.required').on('keyup blur', 'input', function () {
+            validator.checkField.apply($(this).siblings().last()[0]);
+        });
 
-      $('form').submit(function(e) {
-        e.preventDefault();
-        var submit = true;
+        $('form').submit(function (e) {
+            e.preventDefault();
+            var submit = true;
 
-        // evaluate the form using generic validaing
-        if (!validator.checkAll($(this))) {
-          submit = false;
-        }
-
-        if (submit) {
-            $("#search_group_to option[name='user_group']").each(function(i){
-            if(this.value){
-            $("#group_sel").append("<option selected='selected' value='"+this.value+"'>"+this.text+"</option>");
+            // evaluate the form using generic validaing
+            if (!validator.checkAll($(this))) {
+                submit = false;
             }
-            });
-            $("#search_group option[name='user_group_select']").each(function(i){
-            if(this.value){
-            $("#group_del").append("<option selected='selected' value='"+this.value+"'>"+this.text+"</option>");
-            }
-            });
-            $("#search_to option[name='permission']").each(function(i){
-            if(this.value){
-            $("#perm_sel").append("<option selected='selected' value='"+this.value+"'>"+this.text+"</option>");
-            }
-            });
-            $("#search option[name='permission_select']").each(function(i){
-            if(this.value){
-            $("#perm_del").append("<option selected='selected' value='"+this.value+"'>"+this.text+"</option>");
-            }
-            });
-            this.submit();
-        }
 
-        return false;
-      });
+            if (submit) {
+                $("#search_group_to option[name='user_group']").each(function (i) {
+                    if (this.value) {
+                        $("#group_sel").append("<option selected='selected' value='" + this.value + "'>" + this.text + "</option>");
+                    }
+                });
+                $("#search_group option[name='user_group_select']").each(function (i) {
+                    if (this.value) {
+                        $("#group_del").append("<option selected='selected' value='" + this.value + "'>" + this.text + "</option>");
+                    }
+                });
+                $("#search_to option[name='permission']").each(function (i) {
+                    if (this.value) {
+                        $("#perm_sel").append("<option selected='selected' value='" + this.value + "'>" + this.text + "</option>");
+                    }
+                });
+                $("#search option[name='permission_select']").each(function (i) {
+                    if (this.value) {
+                        $("#perm_del").append("<option selected='selected' value='" + this.value + "'>" + this.text + "</option>");
+                    }
+                });
+                this.submit();
+            }
+
+            return false;
+        });
+
+        $(document).ready(function ($) {
+            $('.js-multiselect').multiselect({//左侧选择框
+                right: '#js_multiselect_to_1',//右侧选择框id
+                rightAll: '#js_right_All_1', //全部右移
+                rightSelected: '#js_right_Selected_1',//选中右移
+                leftSelected: '#js_left_Selected_1',//选中左移
+                leftAll: '#js_left_All_1',//全部左移
+                keepRenderingSort: true //保存排序
+            });
+        });
     </script>
+
     <!-- /validator -->
 {% endblock %}

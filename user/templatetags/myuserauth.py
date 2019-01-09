@@ -8,10 +8,35 @@ from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from saltstack.models import SaltGroup, SaltHost
+from user.models import Users
 
 from user.models import Users
 
 register = template.Library()
+
+
+def show_permissions(aid, perm_type):
+    '''
+    获取所有权限
+    '''
+    select_permissions_dict = {}
+    permissions = Permission.objects.filter(
+        Q(content_type__app_label__exact='asset') |
+        Q(content_type__app_label__exact='deploy') |
+        Q(content_type__app_label__exact='userperm')).values('pk', 'name')
+    permissions_dict = {i['pk']:i['name'] for i in permissions}
+
+    if aid and perm_type == 'user':
+        user = Users.objects.get(pk=aid)
+        select_permissions_dict = {i['pk']: i['name'] for i in user.user_permissions.values('pk', 'name')}
+
+    for i in select_permissions_dict:
+        if i in permissions_dict:
+            del permissions_dict[i]
+
+    return {'permissions_dict':permissions_dict, 'select_permissions_dict':select_permissions_dict}
+
+register.inclusion_tag('tags/tag_permissions.html')(show_permissions)
 
 
 def show_users(aid, value):
