@@ -17,3 +17,16 @@ class ProjectsForm(forms.ModelForm):
             'before_deploy': forms.TextInput(attrs={'class': 'form-control'}),
             'after_deploy': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+
+class DeploysForm(forms.ModelForm):
+    class Meta:
+        model = Deploys
+        fields = ('project', 'branch', 'jenkinsbd','host','comment')
+        widgets = {
+            'project': forms.Select(attrs={'class': 'form-control', 'required': 'required'}),
+            'jenkinsbd': forms.Select(attrs={'class': 'form-control', 'required': 'required'}),
+            'branch': forms.Select(attrs={'class': 'form-control', 'required': 'required'}),
+            'host': forms.Select(attrs={'class': 'form-control', 'required': 'required'}),
+            'comment': forms.TextInput(attrs={'class': 'form-control', 'required': 'required'}),
+        }

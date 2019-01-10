@@ -35,114 +35,18 @@
                                 {% csrf_token %}
 
 
-                                <div class="item form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12"><label
-                                            for="id_project">发布项目:</label>
-                                    </label>
-                                    <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <select class="form-control" id="id_project" name="project" required="required">
-                                            <option value="" selected="selected">---------</option>
-                                            <option value="1">pss</option>
-                                        </select>
-                                        <div style="padding-top:10px;">
-
+                                {% for i in form %}
+                                    <div class="item form-group">
+                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">{{ i.label_tag }}
+                                        </label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            {{ i }}
+                                            <div style="padding-top:10px;">
+                                                {{ i.errors }}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-
-
-                                <div class="item form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12"><label
-                                            for="id_project">应用列表:</label>
-                                    </label>
-                                    <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <select multiple="multiple" class="form-control" id="id_pack" name="name_pack"
-                                                required="required">
-                                        </select>
-                                        <div style="padding-top:10px;">
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="item form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12"><label
-                                            for="id_project">SprintNO:</label>
-                                    </label>
-                                    <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <select class="form-control" id="id_sprint" name="name_sprint"
-                                                required="required">
-                                            <option value="" selected="selected">---------</option>
-                                        </select>
-                                        <div style="padding-top:10px;">
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="item form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12"><label
-                                            for="id_project">BuildNO:</label>
-                                    </label>
-                                    <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <select class="form-control" id="id_build" name="name_build"
-                                                required="required">
-                                            <option value="" selected="selected">---------</option>
-                                        </select>
-                                        <div style="padding-top:10px;">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="item form-group" style="display:none">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12"><label
-                                            for="id_branch">Git分支:</label>
-                                    </label>
-                                    <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <select class="form-control" id="id_branch" name="name_branch"
-                                                required="required">
-                                            {#                                            <option value="" selected="selected">---------</option>#}
-                                            <option value="master" selected="selected">master</option>
-                                            <option value="bugfix">bugfix</option>
-                                            <option value="dev">dev</option>
-                                        </select>
-                                        <div style="padding-top:10px;">
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="item form-group" style="display:none">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12"><label for="id_jenkinsbd">Jenkins任务:</label>
-                                    </label>
-                                    <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <select class="form-control" id="id_jenkinsbd" name="name_jenkinsbd"
-                                                required="required">
-                                            {#                                            <option value="" selected="selected">---------</option>#}
-                                            <option value="yes">构建</option>
-                                            <option value="no" selected="selected">不构建</option>
-                                        </select>
-                                        <div style="padding-top:10px;">
-
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                                <div class="item form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12"><label
-                                            for="id_host">目标主机:</label>
-                                    </label>
-                                    <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <select class="form-control" id="id_host" name="name_host" required="required">
-                                            <option value="" selected="selected">---------</option>
-                                            <option value="1">wangchao</option>
-                                        </select>
-                                        <div style="padding-top:10px;">
-
-                                        </div>
-                                    </div>
-                                </div>
+                                {% endfor %}
 
 
                                 {{ hform.as_p }}

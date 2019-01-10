@@ -14,6 +14,7 @@ from channels.layers import get_channel_layer
 import os
 import paramiko
 from asgiref.sync import async_to_sync
+from .deploy import rundeploys
 
 
 # Create your views here.
@@ -111,6 +112,7 @@ def code_deploy_list(request):
         raise Http404
 
 
+
 @login_required
 def code_deploy_manage(request, aid=None, action=None):
     """
@@ -119,11 +121,11 @@ def code_deploy_manage(request, aid=None, action=None):
     if request.user.has_perms(['asset.view_asset', 'asset.edit_asset']):
         page_name = ''
         if aid:
-            deploy_list = get_object_or_404(Deploys, pk=aid)
+            deploy_obj = get_object_or_404(Deploys, pk=aid)
             if action == 'edit':
                 page_name = '编辑发布项目'
             elif action == 'delete':
-                deploy_list.delete()
+                deploy_obj.delete()
                 return redirect('code_deploy_list')
             elif action == 'get':
                 """获取进度信息"""
@@ -134,38 +136,30 @@ def code_deploy_manage(request, aid=None, action=None):
                 deploy.progress = 0
                 deploy.status = 3
                 deploy.save()
-                # rundeploys.rollback(deploy)
+                rundeploys.rollback(deploy)
                 return redirect('code_deploy_progress', pk=deploy.id)
 
-
         else:
-            deploy_list = Deploys()
+            deploy_obj = Deploys()
             action = 'add'
             page_name = '新增发布项目'
 
         if request.method == 'POST':
-            if action == 'add':
-                data = request.POST.dict()
-                data_new = {}
-                project = Projects.objects.get(pk=data['project'])
-                data_new['project'] = project
-                data_new['user'] = request.user
-                data_new['status'] = 3
-                data_new['host'] = ServerAsset.objects.get(pk=data['name_host'])
-                data_new['packs'] = ','.join(request.POST.getlist('name_pack'))
-                # data_new['pack_url'] = '{0}/{1}/{2}/'.format(settings.FILESERVER,data['name_sprint'],data['name_build'])
-                data_new['pack_url'] = ''
-                data_new['jenkinsbd'] = data['name_jenkinsbd']
-                data_new['branch'] = data['name_branch']
-                print(data_new['packs'])
-                data = data_new
-                deploy = Deploys(**data)
-                deploy.save()
-                # rundeploys.deploy(deploy)
-                return redirect('code_deploy_progress', pk=deploy.id)
-        else:
+            form = DeploysForm(request.POST, instance=deploy_obj)
 
-            return render(request, 'ops/code_deploy_manage.html', locals())
+            if form.is_valid():
+                if action == 'add':
+                    form.save()
+                    return redirect('deploy_list')
+                if action == 'edit':
+                    form.save()
+                    rundeploys.deploy(deploy_obj)
+                    return redirect('deploy_list')
+        else:
+            form = DeploysForm(instance=deploy_obj)
+
+        return render(request, 'ops/code_deploy_manage.html', {"form": form, "page_name": page_name, "action": action})
+
     else:
         raise Http404
 
