@@ -58,6 +58,7 @@ class Deploys(models.Model):
     jenkinsbd = models.CharField(max_length=10, blank=True, null=True, choices=JENKINS_YN, verbose_name='Jenkins任务')
     progress = models.IntegerField(default=0, verbose_name='进度')
     status = models.IntegerField(default=0,choices=STATUS_LIST, verbose_name='状态')
+    comment = models.TextField(blank=True, null=True, verbose_name='描述')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     updated_at = models.DateTimeField(auto_now_add=True, verbose_name='更新时间')
 
