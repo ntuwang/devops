@@ -42,8 +42,7 @@
                                     <tr>
                                         <th>详细</th>
                                         <th>项目名称</th>
-                                        <th>web容器</th>
-                                        <th>代码包</th>
+                                        <th>类型</th>
                                         <th>Jenkins任务名</th>
 
                                         {% if perms.deploy.edit_deploy %}
@@ -58,7 +57,6 @@
                                                     class="fa fa-envelope"></i></a></td>
                                             <td>{{ each_project.name }}</td>
                                             <td>{{ each_project.app_type }}</td>
-                                            <td>{{ each_project.warslist }}</td>
                                             <td>{{ each_project.jenkins_name }}</td>
                                             {% if perms.deploy.edit_deploy %}
                                                 <td>
@@ -102,11 +100,6 @@
                                 </table>
                             </div>
                         </form>
-                        {% comment %}                {% if request.user.is_superuser %}
-                <button name="load_city" class="btn btn-info btn-sm" style="margin-left:5px;">载入城市数据</button>
-                <span>如果机房位置无城市选择，则需加载省市区数据</span>
-                <div id="notice_id"></div>
-                {% endif %}{% endcomment %}
                     </div>
                 </div>
             </div>
@@ -116,35 +109,4 @@
 {% block javascripts %}
     {{ block.super }}
     <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-
-    <!-- Datatables -->
-    {% comment %}<script>
-    $(document).ready(function() {
-            $('#datatable').dataTable();
-            });
-
-$(function(){
-        $("button[name='load_city']").bind("click",function(){
-            $(".loading").show();
-            $.ajax({
-type:"POST",
-url:"{% url 'load_city' %}",
-data:{action:"load_city_data"},
-dataType:"html",
-success:function(ret) {
-$(".loading").hide();
-var html = '<div style="margin-left:5px;margin-top:10px;" class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>省市区数据载入完成...</div>';
-$("#notice_id").html(html);
-//省市区数据导入提示框定时消失
-setTimeout("$('#notice_id').fadeOut()", 3000);
-},
-errors:function(e){
-           alert("error");
-       }
-});
-return false;
-})
-})
-</script>{% endcomment %}
-
 {% endblock %}

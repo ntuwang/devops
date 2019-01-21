@@ -14,7 +14,7 @@ from channels.layers import get_channel_layer
 import os
 import paramiko
 from asgiref.sync import async_to_sync
-from .deploy import rundeploys
+from .deploy import DeploysService,deploy_thread
 
 
 # Create your views here.
@@ -112,7 +112,6 @@ def code_deploy_list(request):
         raise Http404
 
 
-
 @login_required
 def code_deploy_manage(request, aid=None, action=None):
     """
@@ -136,8 +135,12 @@ def code_deploy_manage(request, aid=None, action=None):
                 deploy.progress = 0
                 deploy.status = 3
                 deploy.save()
-                rundeploys.rollback(deploy)
+
                 return redirect('code_deploy_progress', pk=deploy.id)
+            elif action=='progress':
+                deploy_id = aid
+                page_name = '发布详情'
+                return render(request, 'ops/code_deploy_progress.html', locals())
 
         else:
             deploy_obj = Deploys()
@@ -149,12 +152,17 @@ def code_deploy_manage(request, aid=None, action=None):
 
             if form.is_valid():
                 if action == 'add':
-                    form.save()
-                    return redirect('deploy_list')
+                    deploy = form.save(commit=False)
+                    deploy.user = Users.objects.get(username=request.user)
+                    deploy.status = 3
+                    deploy.save()
+                    d = DeploysService(deploy.id)
+                    d.start_deploy()
+
+                    return redirect('code_deploy_manage',action='progress',aid=deploy.id)
                 if action == 'edit':
                     form.save()
-                    rundeploys.deploy(deploy_obj)
-                    return redirect('deploy_list')
+                    return redirect('code_deploy_list')
         else:
             form = DeploysForm(instance=deploy_obj)
 
@@ -162,14 +170,6 @@ def code_deploy_manage(request, aid=None, action=None):
 
     else:
         raise Http404
-
-
-@login_required
-def code_deploy_progress(request, pk):
-    deploy_id = pk
-    page_name = '发布详情'
-    return render(request, 'code_deploy_progress.html', locals())
-
 
 def aliyun_dns_list(request):
     cps = Conf_Parser('conf/settings.conf')

@@ -7,15 +7,15 @@ from asset.models import ServerAsset
 
 
 class Projects(models.Model):
+    web_type = (
+        ('war', 'war'),
+        ('jar', 'jar'),
+    )
     name = models.CharField(max_length=100, blank=True, verbose_name=u'项目名称')
-    app_type = models.CharField(max_length=100, blank=True, verbose_name=u'web容器')
+    app_type = models.CharField(max_length=100, blank=True,choices=web_type, verbose_name=u'类型')
     jenkins_name = models.CharField(max_length=200, blank=True, verbose_name=u'Jenkins任务名称')
-    destwar_dir = models.CharField(max_length=200, blank=True, verbose_name=u'目标路径')
-    warslist = models.CharField(max_length=200, blank=True, verbose_name=u'代码包')
-    local_dir = models.CharField(max_length=200, blank=True, verbose_name=u'临时路径')
+    dest_path = models.CharField(max_length=200, blank=True, verbose_name=u'目标路径')
     remote_history_dir = models.CharField(max_length=200, blank=True, verbose_name=u'备份历史路径')
-    before_deploy = models.TextField(blank=True, null=True, verbose_name=u'部署前命令')
-    after_deploy = models.TextField(blank=True, null=True, verbose_name=u'部署后命令')
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True, verbose_name=u'创建时间')
     updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True, verbose_name=u'更新时间')
 
@@ -54,12 +54,10 @@ class Deploys(models.Model):
     user = models.ForeignKey(Users,on_delete=models.CASCADE)
     project = models.ForeignKey(Projects, verbose_name='发布项目',on_delete=models.CASCADE)
     host = models.ForeignKey(ServerAsset, blank=True, null=True, verbose_name='目标主机',on_delete=models.CASCADE)
-    warnames = models.CharField(max_length=100,blank=True, null=True, verbose_name='代码包')
     branch = models.CharField(max_length=100, blank=True, null=True, choices=BRANCH_LIST, verbose_name='Git分支')
     jenkinsbd = models.CharField(max_length=10, blank=True, null=True, choices=JENKINS_YN, verbose_name='Jenkins任务')
     progress = models.IntegerField(default=0, verbose_name='进度')
     status = models.IntegerField(default=0,choices=STATUS_LIST, verbose_name='状态')
-    comment = models.TextField(blank=True, null=True, verbose_name='描述')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     updated_at = models.DateTimeField(auto_now_add=True, verbose_name='更新时间')
 

@@ -51,31 +51,31 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {% for each_code_deploy in all_code_deploy_list %}
+                                    {% for each in all_code_deploy_list %}
                                         <tr>
-                                            <td>{{ each_code_deploy.user }}</td>
-                                            <td>{{ each_code_deploy.project }}</td>
-                                            <td>{{ each_code_deploy.branch }}</td>
-                                            <td>{{ each_code_deploy.get_status_display }}</td>
-                                            <td>{{ each_code_deploy.created_at }}</td>
+                                            <td>{{ each.user }}</td>
+                                            <td>{{ each.project }}</td>
+                                            <td>{{ each.branch }}</td>
+                                            <td>{{ each.get_status_display }}</td>
+                                            <td>{{ each.created_at }}</td>
                                             {% if perms.asset.edit_asset %}
                                                 <td>
-                                                    <a href="{% url 'code_deploy_progress' pk=each_code_deploy.pk %}" title="信息"
+                                                    <a href="{% url 'code_deploy_manage' action='progress' aid=each.pk %}" title="信息"
                                                        class="btn btn-info btn-sm" role="button"><i
                                                             class="fa fa-info-circle"></i></a>
                                                     <a href="#" data-toggle="modal"
-                                                       data-target="#reqRollback-{{ each_code_deploy.pk }}" title="回滚"
+                                                       data-target="#reqRollback-{{ each.pk }}" title="回滚"
                                                        class="btn btn-warning btn-sm" role="button"><i
                                                             class="fa fa-history "></i></a>
                                                     <a href="#" data-toggle="modal"
-                                                       data-target="#reqDelete-{{ each_code_deploy.pk }}" title="删除"
+                                                       data-target="#reqDelete-{{ each.pk }}" title="删除"
                                                        class="btn btn-danger btn-sm" role="button"><i
                                                             class="fa fa-trash-o "></i></a>
                                                 </td>
                                             {% endif %}
                                             <!-- 模态框（Modal） -->
                                             <!-- Rollback -->
-                                            <div class="modal fade" id="reqRollback-{{ each_code_deploy.pk }}"
+                                            <div class="modal fade" id="reqRollback-{{ each.pk }}"
                                                  tabindex="-1" role="dialog" aria-labelledby="reqRollback"
                                                  aria-hidden="true">
                                                 <div class="modal-dialog">
@@ -88,8 +88,8 @@
                                                         </div>
                                                         <div class="modal-body">
                                                             确认是否回滚？
-                                                            <div><br/><strong>{{ each_code_deploy.project }}
-                                                                to {{ each_code_deploy.host }}</strong></p>
+                                                            <div><br/><strong>{{ each.project }}
+                                                                to {{ each.host }}</strong></p>
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
@@ -97,14 +97,14 @@
                                                                     data-dismiss="modal">关闭
                                                             </button>
                                                             <a style="margin:4px;" class="btn btn-danger btn-sm"
-                                                               href="{% url 'code_deploy_manage' aid=each_code_deploy.pk action='rollback' %}">回滚</a>
+                                                               href="{% url 'code_deploy_manage' aid=each.pk action='rollback' %}">回滚</a>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <!-- Delete -->
-                                            <div class="modal fade" id="reqDelete-{{ each_code_deploy.pk }}"
+                                            <div class="modal fade" id="reqDelete-{{ each.pk }}"
                                                  tabindex="-1" role="dialog" aria-labelledby="reqDelete"
                                                  aria-hidden="true">
                                                 <div class="modal-dialog">
@@ -117,8 +117,8 @@
                                                         </div>
                                                         <div class="modal-body">
                                                             确认是否删除？
-                                                            <div><br/><strong>{{ each_code_deploy.project }}
-                                                                to {{ each_code_deploy.host }}</strong></p>
+                                                            <div><br/><strong>{{ each.project }}
+                                                                to {{ each.host }}</strong></p>
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
@@ -126,7 +126,7 @@
                                                                     data-dismiss="modal">关闭
                                                             </button>
                                                             <a style="margin:4px;" class="btn btn-danger btn-sm"
-                                                               href="{% url 'code_deploy_manage' aid=each_code_deploy.pk action='delete' %}">删除</a>
+                                                               href="{% url 'code_deploy_manage' aid=each.pk action='delete' %}">删除</a>
                                                         </div>
                                                     </div><!-- /.modal-content -->
                                                 </div><!-- /.modal-dialog -->

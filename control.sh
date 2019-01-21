@@ -12,7 +12,7 @@ pidfile=$logdir/$app.pid
 logfile=$logdir/$app.log
 if [ X$2==X ]
 then
-port=2000
+port=8000
 else
 port=$2
 fi
@@ -37,7 +37,7 @@ function start() {
         return 1
     fi
 
-    gunicorn -w 1 -b 127.0.0.1:$port devops.wsgi:application -D --pid $pidfile --capture-output --error-logfile $logdir/error.log --log-level debug --log-file=$logfile &> $logfile 2>&1
+    gunicorn -w 2 -b 127.0.0.1:$port $app.wsgi:application -D --pid $pidfile --capture-output --log-level debug --log-file=$logfile 2>&1
     sleep 1
     echo -n "$app started..., pid="
     cat $pidfile
