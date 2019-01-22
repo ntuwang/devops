@@ -1,7 +1,8 @@
 {% extends 'base/base.html' %}
 {% load myinclusion %}
 {% block stylesheets %}
-    <link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    {{ block.super }}
+
 {% endblock %}
 {% block content %}
     <div class="right_col" role="main">
@@ -53,7 +54,7 @@
 {% endblock %}
 
 {% block javascripts %}
-
+  {{ block.super }}
     <script type="text/javascript">
 
         function get_deploy_progress(deploy_id, callback) {
@@ -117,22 +118,6 @@
             var vars = get_url_vars();
             $.progress(vars["deploys"]);
         });
-        $('#id_contract_date').datetimepicker({
-            //language:  'fr',
-            format: 'yyyy-mm-dd',
-            language: 'zh-CN',
-            weekStart: 1,
-            setStartDate: new Date(),
-            todayBtn: 1,
-            autoclose: 1,
-            todayHighlight: 1,
-            startView: 3,
-            minView: 2,
-            forceParse: 0,
-            showMeridian: 1,
-            pickerPosition: "bottom-left"
-        });
-
 
     </script>
 {% endblock %}

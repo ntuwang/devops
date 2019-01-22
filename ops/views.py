@@ -14,7 +14,9 @@ from channels.layers import get_channel_layer
 import os
 import paramiko
 from asgiref.sync import async_to_sync
-from .deploy import DeploysService,deploy_thread
+from .deploy import DeploysService, deploy_thread
+from django.db.models import F
+import datetime
 
 
 # Create your views here.
@@ -104,10 +106,40 @@ def code_deploy_list(request):
                 aid = request.get_full_path().split('=')[1]
                 code_deploy_detail = Deploys.objects.filter(id=aid)
                 return render(request, 'ops/code_deploy_list.html', {'code_deploy_detail': code_deploy_detail})
+            return render(request, 'ops/code_deploy_list.html')
 
-        all_code_deploy = Deploys.objects.all().order_by('-created_at')[:10]
+        elif request.method == 'POST':
 
-        return render(request, 'ops/code_deploy_list.html', {'all_code_deploy_list': all_code_deploy})
+            offset = int(request.POST.get('offset'))
+            limit = int(request.POST.get('limit'))
+            limit = offset + limit
+
+            record_list = Deploys.objects.all().values(
+                'id',
+                'branch',
+                'status',
+                'created_at',
+                user_username=F('user__username'),
+                project_name=F('project__name'),
+            )
+
+            search = request.POST.get('search', '')
+            try:
+                search_1 = int(search)
+            except:
+                search_1 = ''
+            if search:
+                if search_1:
+                    record_list = [i for i in record_list if search in i.values() or search_1 in i.values()]
+
+                else:
+                    record_list = [i for i in record_list if search in i.values()]
+
+            data = {'total': len(record_list),
+                    'rows': record_list[offset:limit],
+                    }
+            return JsonResponse(data)
+
     else:
         raise Http404
 
@@ -137,7 +169,7 @@ def code_deploy_manage(request, aid=None, action=None):
                 deploy.save()
 
                 return redirect('code_deploy_progress', pk=deploy.id)
-            elif action=='progress':
+            elif action == 'progress':
                 deploy_id = aid
                 page_name = '发布详情'
                 return render(request, 'ops/code_deploy_progress.html', locals())
@@ -159,7 +191,7 @@ def code_deploy_manage(request, aid=None, action=None):
                     d = DeploysService(deploy.id)
                     d.start_deploy()
 
-                    return redirect('code_deploy_manage',action='progress',aid=deploy.id)
+                    return redirect('code_deploy_manage', action='progress', aid=deploy.id)
                 if action == 'edit':
                     form.save()
                     return redirect('code_deploy_list')
@@ -170,6 +202,7 @@ def code_deploy_manage(request, aid=None, action=None):
 
     else:
         raise Http404
+
 
 def aliyun_dns_list(request):
     cps = Conf_Parser('conf/settings.conf')

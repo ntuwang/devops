@@ -43,13 +43,12 @@ class Deploys(models.Model):
         ('yes', u'构建'),
         ('no', u'不构建'),
     )
+
     STATUS_LIST = (
         (0, '失败'),
         (1, '成功'),
         (2, '进行中'),
         (3, '等待'),
-        (4, '回滚成功'),
-        (5, '回滚失败'),
     )
     user = models.ForeignKey(Users,on_delete=models.CASCADE)
     project = models.ForeignKey(Projects, verbose_name='发布项目',on_delete=models.CASCADE)
@@ -57,13 +56,13 @@ class Deploys(models.Model):
     branch = models.CharField(max_length=100, blank=True, null=True, choices=BRANCH_LIST, verbose_name='Git分支')
     jenkinsbd = models.CharField(max_length=10, blank=True, null=True, choices=JENKINS_YN, verbose_name='Jenkins任务')
     progress = models.IntegerField(default=0, verbose_name='进度')
-    status = models.IntegerField(default=0,choices=STATUS_LIST, verbose_name='状态')
+    status = models.IntegerField(default=3,choices=STATUS_LIST, verbose_name='状态')
     comment = models.TextField(blank=True, null=True, verbose_name='描述')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     updated_at = models.DateTimeField(auto_now_add=True, verbose_name='更新时间')
 
     def __str__(self):
-        return self.project
+        return '{0} for {1}'.format(self.user.username,self.project.name)
 
     class Meta:
         default_permissions = ()

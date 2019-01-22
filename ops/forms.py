@@ -22,7 +22,7 @@ class ProjectsForm(forms.ModelForm):
 class DeploysForm(forms.ModelForm):
     class Meta:
         model = Deploys
-        fields = ('project', 'branch', 'jenkinsbd','host','comment')
+        fields = ('project', 'branch', 'jenkinsbd','host')
         widgets = {
             'project': forms.Select(attrs={'class': 'form-control', 'required': 'required'}),
             'jenkinsbd': forms.Select(attrs={'class': 'form-control', 'required': 'required'}),

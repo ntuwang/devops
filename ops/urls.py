@@ -13,7 +13,7 @@ urlpatterns = [
     url(r'^project/edit/(?P<action>[\w-]+)/(?P<aid>\d+)/$', oviews.project_manage, name='project_manage'),
     url(r'^code/deploy_list/$', oviews.code_deploy_list, name='code_deploy_list'),
     url(r'^code/deploy_add/$', oviews.code_deploy_manage, name='code_deploy_add'),
-    url(r'^code/view/(?P<action>[\w-]+)/(?P<aid>\d+)/$', oviews.code_deploy_manage, name='code_deploy_manage'),
+    url(r'^code/deploy_manage/(?P<action>[\w-]+)/(?P<aid>\d+)/$', oviews.code_deploy_manage, name='code_deploy_manage'),
 
     url(r'^dns/list/$', oviews.aliyun_dns_list, name='aliyun_dns_list'),
 

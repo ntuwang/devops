@@ -7,7 +7,6 @@ import threading
 from .models import Deploys
 import fnmatch
 from django.conf import settings
-from utils.fabfile import Fabapi
 from utils.jenkinsjob import JenkinsJob
 import time
 import traceback
@@ -66,28 +65,27 @@ def deploy_thread(deploy):
         sapi.remote_execution('*', 'cmd.run', 'wget http://devops-wctest.chinacloudapp.cn/file_download_manage/test01.war -o /root/test01.war')
 
         # =========== before deploy  =================
-        hostfab = Fabapi(hostip=deploy.host.public_ip)
         deploy_service.append_comment( "准备部署 目标主机： {0}\n".format(deploy.host.public_ip))
         cmd = ("mkdir -p {remote_history_dir} && chmod -R 777 {remote_history_dir}".format(
             remote_history_dir=os.path.join(deploy.project.remote_history_dir,
                                             deploy.created_at.strftime('%Y%m%d-%H%M%S'))))
-        hostfab.remoted(cmd)
-        # execute(hostfab.remoted, rd=cmd, sudoif=1)
 
+        # execute(hostfab.remoted, rd=cmd, sudoif=1)
+        sapi.remote_execution(deploy.host.public_ip,'cmd.run',cmd)
         deploy_service.append_comment( "--删除过期的历史备份\n")
         cmd = ("WORKSPACE='{0}' && cd $WORKSPACE && ls -1t | tail -n +{1} | xargs rm -rf".format(
-            deploy.project.remote_history_dir, settings.MAX_DEPLOY_HISTORY))
-        hostfab.remoted(cmd)
+            deploy.project.remote_history_dir, cp.get('deploy','backup_count')))
+        sapi.remote_execution(deploy.host.public_ip, 'cmd.run', cmd)
         # execute(hostfab.remoted, rd=cmd, sudoif=1)
         before_deploy = deploy.project.before_deploy.replace("\r", "").replace("\n", " && ")
         # ========== create dest dirs ===================
 
         cmd = ("mkdir -p {destwar_dir} ".format(destwar_dir=deploy.project.destwar_dir))
-        hostfab.remoted(cmd)
+        sapi.remote_execution(deploy.host.public_ip, 'cmd.run', cmd)
         # execute(hostfab.remoted, rd=cmd, sudoif=1)
         if before_deploy:
             cmd = before_deploy
-            hostfab.remoted(cmd)
+            sapi.remote_execution(deploy.host.public_ip, 'cmd.run', cmd)
             deploy_service.append_comment( "暂停tomcat应用\n--exec {0}\n".format(cmd))
             # execute(hostfab.remoted, rd=cmd, sudoif=1)
 
@@ -107,7 +105,7 @@ def deploy_thread(deploy):
                                                                 deploy.created_at.strftime('%Y%m%d-%H%M%S'))))
 
                         deploy_service.append_comment( "--执行本次备份\n")
-                        hostfab.remoted(cmd)
+                        sapi.remote_execution(deploy.host.public_ip, 'cmd.run', cmd)
                         # execute(hostfab.remoted, rd=cmd, sudoif=1)
                         deploy_service.append_comment( "--部署新版本应用包\n")
 
