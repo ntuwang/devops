@@ -147,35 +147,9 @@
                             field: 'operate',
                             title: '操作',
                             formatter: function (value, row, index) {
-                                var x = '<a  id="DeleteJob" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> 终止进程 </a>';
+                                var url = '{% url 'code_deploy_manage' action='progress' aid='999999' %}'.replace(/999999/,row.id);
+                                var x = '<a href="' + url + '" class="btn btn-xs btn-info"><i class="fa fa-eye"></i> 查看进度 </a>';
                                 return x;
-                            },
-                            events: {
-                                'click #DeleteJob': function (e, value, row, index) {
-                                    var rows = [row];
-
-                                    $(this).attr('disabled', 'disabled');
-                                    $(this).html('Deleting');
-                                    $.ajax({
-                                        type: "POST",
-                                        url: "/test",
-                                        data: {
-                                            'rows': JSON.stringify(rows),
-                                            'csrfmiddlewaretoken': '{{ csrf_token }}'
-                                        },
-                                        dataType: 'json',
-                                        beforeSend: function (xhr, settings) {
-                                        },
-                                        success: function (data) {
-                                            if (data.status == "error") {
-                                                alert(data.result_content)
-                                            } else {
-                                                alert(data.result_content);
-                                                location.href = window.location.href;
-                                            }
-                                        }
-                                    });
-                                },
                             },
                         },
                 ],

@@ -34,7 +34,12 @@ def salt_key_list(request):
     if request.user.is_superuser:
         minions = SaltHost.objects.filter(status=True)
         minions_pre = SaltHost.objects.filter(status=False)
-        return render(request, 'asset/salt_key_list.html', {'all_minions': minions, 'all_minions_pre': minions_pre})
+        data = {
+            'all_minions': minions,
+            'all_minions_pre': minions_pre,
+            'page_name': 'salt主机列表'
+        }
+        return render(request, 'asset/salt_key_list.html', data)
     else:
         raise Http404
 
@@ -137,7 +142,11 @@ def salt_group_list(request):
 
     if request.user.is_superuser:
         groups = SaltGroup.objects.all()
-        return render(request, 'asset/salt_group_list.html', {'all_groups': groups})
+        data = {
+            'all_groups': groups,
+            'page_name': 'salt主机分组列表'
+        }
+        return render(request, 'asset/salt_group_list.html', data)
     else:
         raise Http404
 
@@ -212,8 +221,13 @@ def salt_group_manage(request, id=None):
         else:
             form = SaltGroupForm(instance=group)
 
-        return render(request, 'asset/salt_group_manage.html',
-                      {'form': form, 'action': action, 'page_name': page_name, 'aid': id})
+        data = {
+            'form': form,
+            'action': action,
+            'page_name': page_name,
+            'aid': id,
+        }
+        return render(request, 'asset/salt_group_manage.html',data)
     else:
         raise Http404
 
@@ -247,15 +261,22 @@ def salt_task_list(request):
     '''
     if request.user.has_perm('userperm.view_message'):
         if request.method == 'GET':
-            if request.GET.has_key('tid'):
+            if 'tid' in request.GET:
                 tid = request.get_full_path().split('=')[1]
                 log_detail = Message.objects.filter(user=request.user.first_name).filter(id=tid).exclude(
                     type=u'用户登录').exclude(type=u'用户退出')
-                return render(request, 'saltstack/salt_task_detail.html', {'log_detail': log_detail})
+                data = {
+                    'log_detail': log_detail,
+                    'page_name': 'salt任务列表'
+                }
+                return render(request, 'saltstack/salt_task_detail.html', data)
 
         logs = Message.objects.filter(user=request.user.first_name).exclude(type=u'用户登录').exclude(type=u'用户退出')[:200]
-
-        return render(request, 'saltstack/salt_task_list.html', {'all_logs': logs})
+        data = {
+            'all_logs': logs,
+            'page_name': 'salt任务列表'
+        }
+        return render(request, 'saltstack/salt_task_list.html', data)
     else:
         raise Http404
 
@@ -265,7 +286,10 @@ def salt_task_check(request):
     '''
     任务查询
     '''
-    return render(request, 'saltstack/salt_task_check.html', {})
+    data = {
+        'page_name': 'salt任务查询'
+    }
+    return render(request, 'saltstack/salt_task_check.html', data)
 
 
 @login_required
@@ -297,5 +321,8 @@ def salt_task_running(request):
         p = subprocess.Popen("salt '*' saltutil.term_job %s" % jid, shell=True, stdout=subprocess.PIPE)
         out = p.stdout.readlines()
         return HttpResponse(json.dumps('Job %s killed.' % jid))
+    data = {
+        'page_name':'获取运行中的任务'
+    }
 
-    return render(request, 'saltstack/salt_task_running_list.html', {})
+    return render(request, 'saltstack/salt_task_running_list.html', data)

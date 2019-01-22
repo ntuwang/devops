@@ -31,6 +31,7 @@ import json
 
 from .forms import *
 
+
 def UserIP(request):
     '''
     获取用户IP
@@ -46,7 +47,10 @@ def UserIP(request):
 
 @login_required
 def index(request):
-    return render(request, 'index.html', {})
+    data = {
+        'page_name': '仪表盘'
+    }
+    return render(request, 'index.html', data)
 
 
 @sensitive_post_parameters()
@@ -66,7 +70,7 @@ def login(request, redirect_field_name=REDIRECT_FIELD_NAME, authentication_form=
                         redirect_to = resolve_url(djsettings.LOGIN_REDIRECT_URL)
                     auth_login(request, form.get_user())
                     Message.objects.create(type=u'用户登录', user=request.user, action=u'用户登录',
-                                           action_ip=UserIP(request), content='用户登录 %s'%request.user)
+                                           action_ip=UserIP(request), content='用户登录 %s' % request.user)
                     return HttpResponseRedirect(redirect_to)
             else:
                 username = request.POST.get('username')
@@ -77,7 +81,11 @@ def login(request, redirect_field_name=REDIRECT_FIELD_NAME, authentication_form=
 
     else:
         form = authentication_form(request)
-    return render(request, 'registration/login.html', {'form': form, 'title': '用户登录'})
+    data = {
+        'form': form,
+        'page_name': '用户登录'
+    }
+    return render(request, 'registration/login.html', data)
 
 
 def logout(request, next_page=None, redirect_field_name=REDIRECT_FIELD_NAME):
@@ -108,14 +116,18 @@ def logout(request, next_page=None, redirect_field_name=REDIRECT_FIELD_NAME):
 
 @login_required
 def logoutw(request):
-
     return HttpResponseRedirect('/')
 
 
 @login_required
 def user_list(request):
     all_users = Users.objects.all()
-    return render(request, 'user/user_list.html', {'all_users':all_users})
+    data = {
+        'all_users': all_users,
+        'page_name': '用户列表'
+    }
+    return render(request, 'user/user_list.html', data)
+
 
 @login_required
 def user_manage(request, aid=None, action=None):
@@ -151,12 +163,18 @@ def user_manage(request, aid=None, action=None):
                     user.user_permissions.add(*perm_select)
                     user.user_permissions.remove(*perm_delete)
                     Message.objects.create(type=u'用户管理', user=request.user, action=page_name, action_ip=UserIP(request),
-                                               content=u'%s %s%s，用户名 %s' % (
+                                           content=u'%s %s%s，用户名 %s' % (
                                                page_name, user.last_name, user.first_name, user.username))
                     return redirect('user_list')
         else:
             form = UserForm(instance=user)
+        data = {
+            'form': form,
+            'page_name': page_name,
+            'action': action,
+            'aid': aid
+        }
 
-        return render(request, 'user/user_manage.html', {'form':form, 'page_name':page_name, 'action':action, 'aid':aid})
+        return render(request, 'user/user_manage.html', data)
     else:
         raise Http404

@@ -27,7 +27,11 @@ def file_upload(request):
     '''
     if request.user.has_perm('deploy.view_filemanage'):
         tgt_list = ServerAsset.objects.all()
-        return render(request, 'ops/file_upload.html', {'tgt_list': tgt_list})
+        data = {
+            'tgt_list': tgt_list,
+            'page_name': '文件上传'
+        }
+        return render(request, 'ops/file_upload.html', data)
     else:
         raise Http404
 
@@ -39,7 +43,12 @@ def remote_execution(request):
     '''
     if request.user.has_perm('deploy.view_deploy'):
         tgt_list = ServerAsset.objects.all()
-        return render(request, 'ops/remote_exec.html', {'tgt_list': tgt_list})
+        data = {
+            'tgt_list': tgt_list,
+            'page_name': '远程命令'
+        }
+
+        return render(request, 'ops/remote_exec.html', data)
     else:
         raise Http404
 
@@ -52,8 +61,12 @@ def project_list(request):
     if request.user.has_perm('asset.view_asset'):
         if request.method == 'GET':
             all_project = Projects.objects.all()
+            data = {
+                'all_project_list': all_project,
+                'page_name': '项目列表'
+            }
 
-            return render(request, 'ops/project_list.html', {'all_project_list': all_project})
+            return render(request, 'ops/project_list.html', data)
     else:
         raise Http404
 
@@ -89,8 +102,13 @@ def project_manage(request, aid=None, action=None):
                     return redirect('project_list')
         else:
             form = ProjectsForm(instance=project_list)
+        data = {
+            "form": form,
+            "page_name": page_name,
+            "action": action
+        }
 
-        return render(request, 'ops/project_manage.html', {"form": form, "page_name": page_name, "action": action})
+        return render(request, 'ops/project_manage.html', data)
     else:
         raise Http404
 
@@ -105,8 +123,15 @@ def code_deploy_list(request):
             if 'aid' in request.GET:
                 aid = request.get_full_path().split('=')[1]
                 code_deploy_detail = Deploys.objects.filter(id=aid)
-                return render(request, 'ops/code_deploy_list.html', {'code_deploy_detail': code_deploy_detail})
-            return render(request, 'ops/code_deploy_list.html')
+                data = {
+                    'page_name':'发布明细',
+                    'code_deploy_detail': code_deploy_detail
+                }
+                return render(request, 'ops/code_deploy_list.html', data)
+            data = {
+                'page_name': '发布列表',
+            }
+            return render(request, 'ops/code_deploy_list.html',data)
 
         elif request.method == 'POST':
 
@@ -170,9 +195,12 @@ def code_deploy_manage(request, aid=None, action=None):
 
                 return redirect('code_deploy_progress', pk=deploy.id)
             elif action == 'progress':
-                deploy_id = aid
-                page_name = '发布详情'
-                return render(request, 'ops/code_deploy_progress.html', locals())
+
+                data = {
+                    'deploy_id':aid,
+                    'page_name': '发布过程',
+                }
+                return render(request, 'ops/code_deploy_progress.html', data)
 
         else:
             deploy_obj = Deploys()
@@ -198,7 +226,12 @@ def code_deploy_manage(request, aid=None, action=None):
         else:
             form = DeploysForm(instance=deploy_obj)
 
-        return render(request, 'ops/code_deploy_manage.html', {"form": form, "page_name": page_name, "action": action})
+        data = {
+            "form": form,
+            "page_name": page_name,
+            "action": action
+        }
+        return render(request, 'ops/code_deploy_manage.html', data)
 
     else:
         raise Http404
@@ -236,7 +269,13 @@ def aliyun_dns_list(request):
         if request.method == 'GET':
             dr_list = DnsRecords.objects.all()
 
-            return render(request, 'ops/dns_list.html', {'all_dns_list': dr_list})
+            data = {
+
+                "page_name": '阿里云域名',
+                "all_dns_list": dr_list
+            }
+
+            return render(request, 'ops/dns_list.html', data)
     else:
         raise Http404
 
@@ -244,7 +283,10 @@ def aliyun_dns_list(request):
 @login_required
 def web_term(request):
     page_name = '发布详情'
-    return render(request, 'ops/web_term.html', locals())
+    data = {
+        "page_name": page_name,
+    }
+    return render(request, 'ops/web_term.html', data)
 
 
 def taillog(request, hostname, port, username, password, private, tail):
@@ -276,7 +318,11 @@ def taillog(request, hostname, port, username, password, private, tail):
 def web_log(request):
     if request.method == "GET":
         hosts = ServerAsset.objects.all()
-        return render(request, 'ops/web_log.html', {"hosts": hosts})
+        data = {
+            "page_name": 'web日志',
+            "hosts": hosts
+        }
+        return render(request, 'ops/web_log.html', data)
     if request.method == "POST":
         status = request.POST.get('status', None)
         if not status:

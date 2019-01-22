@@ -22,8 +22,11 @@ def database_list(request):
     """
 
     if request.method == 'GET':
+        data = {
+            'page_name': '数据库列表'
+        }
 
-        return render(request, 'dba/database_list.html')
+        return render(request, 'dba/database_list.html',data)
 
     elif request.method == 'POST':
         offset = int(request.POST.get('offset'))
@@ -58,8 +61,10 @@ def db_metadata(request):
 
     if request.method == 'GET':
         record_list = list(DBInfo.objects.all().values())
-        data = {'record_list': record_list,
-                }
+        data = {
+            'record_list': record_list,
+            'page_name': '数据字典'
+            }
 
         return render(request, 'dba/db_metadata.html', data)
 
@@ -165,6 +170,7 @@ def db_metadata(request):
             'data': data,
             'db_id': db_id,
             'table_name': table_name,
+            'page_name': '数据字典明细'
         }
         return render(request, 'dba/db_metadata.html', context)
 
@@ -189,7 +195,12 @@ def db_manage(request, aid=None, action=None):
 
     if request.method == 'GET':
         form = DBInfoForm(instance=db_list)
-        return render(request, 'dba/db_manage.html', {"form": form, "page_name": page_name, "action": action})
+        data = {
+            "form": form,
+            "page_name": page_name,
+            "action": action
+        }
+        return render(request, 'dba/db_manage.html', data)
 
     elif request.method == 'POST':
         form = DBInfoForm(request.POST, instance=db_list)

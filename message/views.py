@@ -17,9 +17,16 @@ def log_audit(request):
             if 'aid' in request.GET:
                 aid = request.get_full_path().split('=')[1]
                 log_detail = Message.objects.filter(id=aid)
-                return render(request, 'message/log_audit_detail.html',
-                              {'log_detail': log_detail})
+                data = {
+                    'log_detail': log_detail,
+                    'page_name': '日志明细'
+                }
+                return render(request, 'message/log_audit_detail.html',data)
+        data = {
+            'all_logs':logs,
+            'page_name':'审计日志'
+        }
 
-        return render(request, 'message/log_audit.html', {'all_logs': logs})
+        return render(request, 'message/log_audit.html', data)
     else:
         raise Http404
