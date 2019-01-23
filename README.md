@@ -1,6 +1,6 @@
 # devops (持续更新中)
 
-demo
+demo（只是个空架子  大部分功能没开放出来，等权限完成后再打开）
 
 地址 http://gce.dev4ops.cn/
 
