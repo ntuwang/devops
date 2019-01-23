@@ -28,7 +28,6 @@ def deploy_thread(deploy):
 
     sapi = SaltApi(url=salt_url, username=salt_username, password=salt_password)
 
-
     if deploy.status != 3:
         return
     try:
@@ -36,106 +35,68 @@ def deploy_thread(deploy):
 
         # =======before checkout========
         deploy_service.update_deploy(progress=5, status=2)
-        deploy_service.append_comment( "Jenkins 任务：\n--任务名称:{0},git分支:{1}\n".format(jenkins_job, deploy.branch))
+        deploy_service.append_comment("Jenkins 任务：\n--任务名称:{0},git分支:{1}\n".format(jenkins_job, deploy.branch))
+        time.sleep(8)
 
         # ======== Jenkins ========
         if deploy.jenkinsbd.strip() == 'yes':
-            deploy_service.append_comment( "--拉取代码并编译打包（by git and maven）\n")
+            deploy_service.append_comment("--拉取代码并编译打包（by git and maven）\n")
             jenkins = JenkinsJob(username=jenkins_user, password=jenkins_pass,
                                  jobname='{0}.{1}'.format(deploy.branch, jenkins_job))
             j = jenkins.jobbuild()
             result = j['result']
             num = int(j['num'])
             if not result == 'SUCCESS':
-                deploy_service.append_comment( "--Jenkins 构建失败\n\n")
+                deploy_service.append_comment("--Jenkins 构建失败\n\n")
                 raise Exception("Jenkins")
             else:
                 deploy_service.append_comment(
-                                              "--Jenkins 构建成功\n"
-                                              "--任务日志请访问:/deploy/code/jenkins/?jobname={0}.{1}&&num={2}\n\n".format(
-                                                  deploy.branch, jenkins_job, num))
+                    "--Jenkins 构建成功\n"
+                    "--任务日志请访问:/deploy/code/jenkins/?jobname={0}.{1}&&num={2}\n\n".format(
+                        deploy.branch, jenkins_job, num))
         else:
-            deploy_service.append_comment( "--Jenkins 任务本次不执行构建\n\n")
+            deploy_service.append_comment("--Jenkins 任务本次不执行构建\n\n")
+        time.sleep(8)
         deploy_service.update_deploy(progress=15, status=2)
 
-        deploy_service.append_comment( "开始部署:\n")
+        deploy_service.append_comment("开始部署:\n")
         # ========= checkouting ==========
-        deploy_service.append_comment( "检出应用程序包。。。\n")
+        deploy_service.append_comment("检出应用程序包。。。\n")
         time.sleep(1)
-        sapi.remote_execution('*', 'cmd.run', 'wget http://devops-wctest.chinacloudapp.cn/file_download_manage/test01.war -o /root/test01.war')
-
+        sapi.remote_execution('*', 'cmd.run',
+                              'wget http://devops-wctest.chinacloudapp.cn/file_download_manage/test01.war -o /root/test01.war')
+        time.sleep(8)
         # =========== before deploy  =================
-        deploy_service.append_comment( "准备部署 目标主机： {0}\n".format(deploy.host.public_ip))
+        deploy_service.append_comment("准备部署 目标主机： {0}\n".format(deploy.host.public_ip))
         cmd = ("mkdir -p {remote_history_dir} && chmod -R 777 {remote_history_dir}".format(
             remote_history_dir=os.path.join(deploy.project.remote_history_dir,
                                             deploy.created_at.strftime('%Y%m%d-%H%M%S'))))
 
         # execute(hostfab.remoted, rd=cmd, sudoif=1)
-        sapi.remote_execution(deploy.host.public_ip,'cmd.run',cmd)
-        deploy_service.append_comment( "--删除过期的历史备份\n")
-        cmd = ("WORKSPACE='{0}' && cd $WORKSPACE && ls -1t | tail -n +{1} | xargs rm -rf".format(
-            deploy.project.remote_history_dir, cp.get('deploy','backup_count')))
         sapi.remote_execution(deploy.host.public_ip, 'cmd.run', cmd)
-        # execute(hostfab.remoted, rd=cmd, sudoif=1)
-        before_deploy = deploy.project.before_deploy.replace("\r", "").replace("\n", " && ")
+        deploy_service.append_comment("--删除过期的历史备份\n")
+        cmd = ("WORKSPACE='{0}' && cd $WORKSPACE && ls -1t | tail -n +{1} | xargs rm -rf".format(
+            deploy.project.remote_history_dir, cp.get('deploy', 'backup_count')))
+        sapi.remote_execution(deploy.host.public_ip, 'cmd.run', cmd)
+        time.sleep(8)
         # ========== create dest dirs ===================
 
-        cmd = ("mkdir -p {destwar_dir} ".format(destwar_dir=deploy.project.destwar_dir))
+        cmd = ("mkdir -p {dest_path} ".format(dest_path=deploy.project.dest_path))
         sapi.remote_execution(deploy.host.public_ip, 'cmd.run', cmd)
         # execute(hostfab.remoted, rd=cmd, sudoif=1)
-        if before_deploy:
-            cmd = before_deploy
-            sapi.remote_execution(deploy.host.public_ip, 'cmd.run', cmd)
-            deploy_service.append_comment( "暂停tomcat应用\n--exec {0}\n".format(cmd))
-            # execute(hostfab.remoted, rd=cmd, sudoif=1)
 
-        deploy_service.update_deploy(progress=67, status=2)
-
-        if deploy.project.destwar_dir.replace("\r", "").replace("\n", ""):
-            for war_name in deploy.warnames.strip().split(','):
-                app_name = war_name.split('.')[0]
-                if app_name:
-                    try:
-                        cmd = (
-                            "mv {destwar_dir}/{war_name} {remote_history_dir} ; rm -rf {destwar_dir}/{app_name} ".format(
-                                destwar_dir=deploy.project.destwar_dir,
-                                war_name=war_name,
-                                app_name=app_name,
-                                remote_history_dir=os.path.join(deploy.project.remote_history_dir,
-                                                                deploy.created_at.strftime('%Y%m%d-%H%M%S'))))
-
-                        deploy_service.append_comment( "--执行本次备份\n")
-                        sapi.remote_execution(deploy.host.public_ip, 'cmd.run', cmd)
-                        # execute(hostfab.remoted, rd=cmd, sudoif=1)
-                        deploy_service.append_comment( "--部署新版本应用包\n")
-
-                        # execute(hostfab.putfile, local_dest="%s/%s" % (localws, war_name),
-                        #         remote_dest=deploy.project.destwar_dir)
-                    except BaseException as e:
-                        print(e)
-                else:
-                    raise Exception("project not exists")
-
-        deploy_service.append_comment( "部署完成!\n")
+        deploy_service.append_comment("部署完成!\n")
         deploy_service.update_deploy(progress=83, status=2)
-
+        time.sleep(8)
         # =============== after deploy =============
-        deploy_service.append_comment( "启动服务并将康检查\n")
-
-        after_deploy = deploy.project.after_deploy.replace("\r", "").replace(
-            "\n", " && ")
-        if after_deploy:
-            cmd = after_deploy
-            deploy_service.append_comment( "--exec {0}\n".format(cmd))
-
-            time.sleep(10)
-        deploy_service.append_comment( "应用启动正常\n")
-        deploy_service.append_comment( "完成,结束!\n")
+        deploy_service.append_comment("启动服务并将康检查\n")
+        deploy_service.append_comment("应用启动正常\n")
+        deploy_service.append_comment("完成,结束!\n")
 
     except BaseException as err:
         traceback.print_exc()
 
-        deploy_service.append_comment( repr(err))
+        deploy_service.append_comment(repr(err))
         deploy_service.update_deploy(progress=100, status=0)
     else:
         deploy_service.update_deploy(progress=100, status=1)

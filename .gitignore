@@ -14,3 +14,4 @@ devops/settings.py
 .DS_Store
 .vscode
 todolist.md
+nohup.out

@@ -238,5 +238,5 @@ def asset_web_ssh(request):
     cps = Conf_Parser('conf/settings.conf')
 
     if request.method == 'POST':
-        ret = {"ip": cps.get('webssh', 'ip'), 'port': 22, "username": cps.get('webssh', 'username'), 'password': cps.get('webssh', 'password'), "static": True}
+        ret = {"ip": cps.get('webssh', 'ip'), 'port': cps.get('webssh', 'port'), "username": cps.get('webssh', 'username'), 'password': cps.get('webssh', 'password'), "static": True}
         return HttpResponse(json.dumps(ret))

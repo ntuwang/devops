@@ -2,7 +2,7 @@
 
 demo
 
-地址 http://devops.dev4ops.cn/
+地址 http://gce.dev4ops.cn/
 
 用户名 wc
    
