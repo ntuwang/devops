@@ -74,10 +74,14 @@ def login(request, redirect_field_name=REDIRECT_FIELD_NAME, authentication_form=
                     return HttpResponseRedirect(redirect_to)
             else:
                 username = request.POST.get('username')
-                user = Users.objects.get(username=username)
-                Message.objects.create(type=u'用户登录', user=user, action=u'用户登录',
-                                       action_ip=UserIP(request),
-                                       content=u'用户登录失败 %s' % request.POST.get('username'))
+                user = Users.objects.filter(username=username).first()
+                if user:
+                    Message.objects.create(type=u'用户登录', user=user, action=u'用户登录',
+                                           action_ip=UserIP(request),
+                                           content=u'用户登录失败 %s' % request.POST.get('username'))
+                else:
+                    Message.objects.create(type=u'用户登录', user=user, action=u'用户登录',
+                                           action_ip=UserIP(request), content='用户 {0} 不存在'.format(username))
 
     else:
         form = authentication_form(request)
@@ -138,9 +142,14 @@ def user_manage(request, aid=None, action=None):
             if action == 'edit':
                 page_name = '编辑用户'
             if action == 'delete':
-                user.delete()
-                Message.objects.create(type=u'用户管理', user=request.user, action=u'删除用户', action_ip=UserIP(request),
-                                       content=u'删除用户 %s%s，用户名 %s' % (user.last_name, user.first_name, user.username))
+                if user == request.user:
+                    Message.objects.create(type=u'用户管理', user=request.user, action=u'删除用户', action_ip=UserIP(request),
+                                           content=u'不能删除当前登录用户')
+                else:
+                    user.delete()
+                    Message.objects.create(type=u'用户管理', user=request.user, action=u'删除用户', action_ip=UserIP(request),
+                                           content=u'删除用户 %s%s，用户名 %s' % (
+                                           user.last_name, user.first_name, user.username))
                 return redirect('user_list')
         else:
             user = Users()
