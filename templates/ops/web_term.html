@@ -160,8 +160,8 @@
                         return;
                     }
 
-
-                    var url = "ws://127.0.0.1:9000/" + 'ws?id=' + msg.id,
+                    var host = window.location.host;
+                    var url = "ws://" + host + ":9000/" + 'ws?id=' + msg.id,
                         socket = new WebSocket(url),
                         terminal = document.getElementById('#terminal'),
                         geometry = current_geometry();
