@@ -33,6 +33,14 @@
                     <ul class="nav child_menu">
                         <li><a href="{% url 'file_manage' %}">文件上传</a>
                         <li><a href="{% url 'remote_execution' %}">远程命令</a>
+                        <li><a href="{% url 'aliyun_dns_list' %}">阿里云解析</a>
+                        <li><a href="{% url 'web_term' %}">web终端</a>
+                        <li><a href="{% url 'web_log' %}">web日志</a>
+                        </li>
+                    </ul>
+                </li>
+                <li><a><i class="fa fa-anchor"></i> 部署管理 <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
                         <li><a href="{% url 'project_list' %}">项目列表</a>
                             <ul class="nav child_menu">
                                 <li class="sub_menu" style="display: none"><a
@@ -45,9 +53,7 @@
                                         href="{% url 'code_deploy_add' %}"></a>
                                 </li>
                             </ul>
-                        <li><a href="{% url 'aliyun_dns_list' %}">阿里云解析</a>
-                        <li><a href="{% url 'web_term' %}">web终端</a>
-                        <li><a href="{% url 'web_log' %}">web日志</a>
+                        <li><a href="{% url 'jenkins_list' %}">Jenkins管理</a>
                         </li>
                     </ul>
                 </li>

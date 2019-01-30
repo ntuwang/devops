@@ -7,16 +7,16 @@ import threading
 from .models import Deploys
 import fnmatch
 from django.conf import settings
-from utils.jenkinsjob import JenkinsJob
+from utils.jenkins_job import JenkinsJob
 import time
 import traceback
 import base64
-from utils.config_parser import Conf_Parser
+from utils.config_parser import ConfParserClass
 from utils.saltapi import SaltApi
 
 
 def deploy_thread(deploy):
-    cp = Conf_Parser('conf/settings.conf')
+    cp = ConfParserClass('conf/settings.conf')
     deploy_service = DeploysService(deploy.id)
     jenkins_ip = cp.get('jenkins', 'url')
     jenkins_job = deploy.project.jenkins_name
@@ -35,14 +35,14 @@ def deploy_thread(deploy):
 
         # =======before checkout========
         deploy_service.update_deploy(progress=5, status=2)
-        deploy_service.append_comment("Jenkins 任务：\n--任务名称:{0},git分支:{1}\n".format(jenkins_job, deploy.branch))
+        deploy_service.append_comment("Jenkins 任务：\n--任务名称:{0}\n".format(jenkins_job))
         time.sleep(8)
 
         # ======== Jenkins ========
-        if deploy.jenkinsbd.strip() == 'yes':
+        if deploy.jenkins_job.strip() == 'yes':
             deploy_service.append_comment("--拉取代码并编译打包（by git and maven）\n")
             jenkins = JenkinsJob(username=jenkins_user, password=jenkins_pass,
-                                 jobname='{0}.{1}'.format(deploy.branch, jenkins_job))
+                                 jobname='{0}'.format(jenkins_job))
             j = jenkins.jobbuild()
             result = j['result']
             num = int(j['num'])

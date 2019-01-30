@@ -1,0 +1,133 @@
+{% extends 'base/base.html' %}
+{% block stylesheets %}
+    {{ block.super }}
+    <link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+    <link href="/static/vendors/bootstrap-table/css/bootstrap-table.min.css" rel="stylesheet">
+
+{% endblock stylesheets %}
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="clearfix"></div>
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <a href="{% url 'code_deploy_add' %}" style="float:left;" class="btn btn-info btn-sm"
+                               role="button" {% if not perms.asset.edit_asset %}disabled{% endif %}><i
+                                    class="fa fa-plus"></i>新建发布</a>
+                            <div class="loading"></div>
+                            <h2>发布列表 </h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                       aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="#">Settings 1</a>
+                                        </li>
+                                        <li><a href="#">Settings 2</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+
+                        <div class="x_content " >
+                            <table id="table"></table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ block.super }}
+
+    <!-- Datatables -->
+    <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="/static/vendors/bootstrap-table/js/bootstrap-table.min.js"></script>
+    <script src="/static/vendors/bootstrap-table/js/bootstrap-table-zh-CN.min.js"></script>
+    <script src="/static/vendors/bootstrap-table/js/bootstrap-table-zh-CN.min.js"></script>
+    <script>
+
+        $(document).ready(function () {
+            // 初始化表格
+            initTable();
+        });
+
+        function initTable() {
+            $('#table').bootstrapTable({
+                method: 'post', // 向服务器请求方式
+                contentType: "application/x-www-form-urlencoded", // 如果是post必须定义
+                url: '#',
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: true,                   //是否显示分页（*）
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                      //初始化加载第一页，默认第一页,并记录
+                pageSize: 10,                       //每页的记录行数（*）
+                pageList: [10, 30, 50, 100],        //可供选择的每页的行数（*）
+                search: true,                       //是否显示表格搜索
+                strictSearch: true,                //是否全匹配搜索
+                searchOnEnterKey: true,              //回车键开始搜索
+                showRefresh: true,                  //是否显示刷新按钮
+                locale: 'zh-CN',                    //本地化
+                queryParamsType: 'limit',
+
+
+                queryParams:    // 请求参数，这个关系到后续用到的异步刷新
+                    function (params) {
+                        return {
+                            limit: params.limit,
+                            offset: params.offset,
+                            search: params.search,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        }
+                    },
+
+                columns: [
+                    {
+                        field: 'job_name',
+                        title: 'job_name'
+
+                    }, {
+                        field: 'build_num',
+                        title: 'build_num',
+                    }, {
+                        field: 'build_status',
+                        title: 'build_status',
+                    },
+                    {
+                        field: 'build_time',
+                        title: 'build_time',
+
+                    },
+                    {
+                        field: 'build_duration',
+                        title: 'build_duration',
+                    },
+
+                        {
+                            field: 'operate',
+                            title: '操作',
+                            formatter: function (value, row, index) {
+                                var url = '{% url 'code_deploy_manage' action='progress' aid='999999' %}'.replace(/999999/,row.id);
+                                var x = '<a href="' + url + '" class="btn btn-xs btn-info"><i class="fa fa-eye"></i> 日志 </a>';
+                                var y = '<a href="' + url + '" class="btn btn-xs btn-warning"><i class="fa fa-history"></i> 回滚 </a>';
+                                return x + y;
+                            },
+                        },
+                ],
+            });
+        }
+
+    </script>
+{% endblock %}

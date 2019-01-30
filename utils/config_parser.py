@@ -3,13 +3,13 @@
 # description: a wrapper class for ConfigParser module
 # date: 2015-10-29
 
-from configparser import ConfigParser
+from configparser import ConfigParser as CP
 
 
-class Conf_Parser:
+class ConfParserClass(object):
     def __init__(self, conf_path):
         self.fpath = conf_path  # 配置文件路径,要求是绝对路径
-        self.cf = ConfigParser()  # ConfigParser对象实例
+        self.cf = CP()  # ConfigParser对象实例
         self.cf.read(self.fpath)  # 一启动就读取配置文件
 
     # 添加指定的节

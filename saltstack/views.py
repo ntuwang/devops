@@ -10,7 +10,7 @@ from django.db.models import Q
 from user.views import UserIP
 from saltstack.forms import *
 from saltstack.models import *
-from utils.config_parser import Conf_Parser
+from utils.config_parser import ConfParserClass
 
 
 try:
@@ -21,7 +21,7 @@ import datetime
 import shutil
 
 
-cps = Conf_Parser('conf/settings.conf')
+cps = ConfParserClass('conf/settings.conf')
 sapi = SaltApi(url=cps.get('saltstack', 'url'), username=cps.get('saltstack', 'username'),
                password=cps.get('saltstack', 'password'))
 

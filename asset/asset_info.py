@@ -5,12 +5,12 @@
 
 from utils.saltapi import SaltApi
 import threading
-from utils.config_parser import Conf_Parser
+from utils.config_parser import ConfParserClass
 
 asset_info = []
 
 
-cps = Conf_Parser('conf/settings.conf')
+cps = ConfParserClass('conf/settings.conf')
 sapi = SaltApi(url=cps.get('saltstack', 'url'), username=cps.get('saltstack', 'username'),
                password=cps.get('saltstack', 'password'))
 

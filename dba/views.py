@@ -2,11 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.core import serializers
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, JsonResponse, StreamingHttpResponse
-from user.models import Users
-from asset.models import ServerAsset
-from ops.models import Projects
-from dba.models import DBInfo
-from utils.config_parser import Conf_Parser
+from utils.config_parser import ConfParserClass
 import json
 from utils.mydb import MysqlConn
 from .forms import *
@@ -69,7 +65,7 @@ def db_metadata(request):
         return render(request, 'dba/db_metadata.html', data)
 
     elif request.method == 'POST':
-        cps = Conf_Parser('conf/settings.conf')
+        cps = ConfParserClass('conf/settings.conf')
         db_id = request.POST.get('db_id', '')
         dbinfo = DBInfo.objects.get(pk=db_id)
         db_username = cps.get('dba', 'username')
@@ -216,7 +212,7 @@ def db_manage(request, aid=None, action=None):
 
 @login_required()
 def get_table_list(request):
-    cps = Conf_Parser('conf/settings.conf')
+    cps = ConfParserClass('conf/settings.conf')
     db_id = request.POST.get('db_id', '')
     dbinfo = DBInfo.objects.get(pk=db_id)
     db_username = cps.get('dba', 'username')

@@ -24,5 +24,6 @@ urlpatterns = [
     path(r'salt/', include('saltstack.urls')),
     path(r'message/', include('message.urls')),
     path(r'ops/', include('ops.urls')),
+    path(r'deploy/', include('deploy.urls')),
     path(r'dba/', include('dba.urls')),
 ]

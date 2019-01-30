@@ -17,7 +17,7 @@ from user.views import UserIP
 from asset.forms import *
 from asset.models import *
 from saltstack.models import SaltHost,SaltGroup
-from utils.config_parser import Conf_Parser
+from utils.config_parser import ConfParserClass
 from asset.asset_info import MultipleCollect
 
 try:
@@ -26,7 +26,7 @@ except ImportError:
     import simplejson as json
 
 
-cps = Conf_Parser('conf/settings.conf')
+cps = ConfParserClass('conf/settings.conf')
 sapi = SaltApi(url=cps.get('saltstack', 'url'), username=cps.get('saltstack', 'username'),
                password=cps.get('saltstack', 'password'))
 
@@ -235,7 +235,7 @@ def owner_manage(request, aid=None, action=None):
 
 @login_required
 def asset_web_ssh(request):
-    cps = Conf_Parser('conf/settings.conf')
+    cps = ConfParserClass('conf/settings.conf')
 
     if request.method == 'POST':
         ret = {"ip": cps.get('webssh', 'ip'), 'port': cps.get('webssh', 'port'), "username": cps.get('webssh', 'username'), 'password': cps.get('webssh', 'password'), "static": True}
