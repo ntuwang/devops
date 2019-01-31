@@ -115,4 +115,3 @@ class ServerAsset(models.Model):
         verbose_name = u'主机资产信息'
         verbose_name_plural = u'主机资产信息管理'
 
-

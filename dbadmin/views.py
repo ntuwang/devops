@@ -68,8 +68,8 @@ def db_metadata(request):
         cps = ConfParserClass('conf/settings.conf')
         db_id = request.POST.get('db_id', '')
         dbinfo = DBInfo.objects.get(pk=db_id)
-        db_username = cps.get('dba', 'username')
-        db_pass = cps.get('dba', 'password')
+        db_username = cps.get('dbadmin', 'username')
+        db_pass = cps.get('dbadmin', 'password')
         db_name = dbinfo.db_name
 
         table_name = request.POST.get('table_name', '')
@@ -215,8 +215,8 @@ def get_table_list(request):
     cps = ConfParserClass('conf/settings.conf')
     db_id = request.POST.get('db_id', '')
     dbinfo = DBInfo.objects.get(pk=db_id)
-    db_username = cps.get('dba', 'username')
-    db_pass = cps.get('dba', 'password')
+    db_username = cps.get('dbadmin', 'username')
+    db_pass = cps.get('dbadmin', 'password')
     da_name = dbinfo.db_name
     table_list = []
 

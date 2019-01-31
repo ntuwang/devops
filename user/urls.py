@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^user/list/$', uviews.user_list, name='user_list'),
     url(r'^user/add/$', uviews.user_manage, name='user_add'),
     url(r'^user/manage/(?P<action>[\w-]+)/(?P<aid>\d+)/$', uviews.user_manage, name='user_manage'),
+    url(r'^log_audit/$', uviews.log_audit, name='log_audit'),
 ]

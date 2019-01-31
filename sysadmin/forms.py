@@ -1,5 +1,5 @@
 from django import forms
-from saltstack.models import *
+from sysadmin.models import *
 
 
 class SaltGroupForm(forms.ModelForm):

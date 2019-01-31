@@ -4,7 +4,7 @@
 # @Author  : Wang Chao
 
 
-from message.models import Message
+from user.models import Message
 from utils.saltapi import SaltApi
 from django.conf import settings
 
@@ -16,7 +16,7 @@ from django.db.models import Q
 from user.views import UserIP
 from asset.forms import *
 from asset.models import *
-from saltstack.models import SaltHost,SaltGroup
+from sysadmin.models import SaltHost,SaltGroup
 from utils.config_parser import ConfParserClass
 from asset.asset_info import MultipleCollect
 

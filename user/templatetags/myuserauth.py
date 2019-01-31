@@ -7,7 +7,7 @@ from django import template
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
-from saltstack.models import SaltGroup, SaltHost
+from sysadmin.models import SaltGroup, SaltHost
 from user.models import Users
 
 from user.models import Users

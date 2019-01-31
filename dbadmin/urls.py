@@ -1,8 +1,8 @@
 from django.conf.urls import url
 
-from dba import views as dviews
+from dbadmin import views as dviews
 
-# app_name = 'dba'
+# app_name = 'dbadmin'
 
 urlpatterns = [
 

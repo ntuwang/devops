@@ -24,7 +24,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.shortcuts import resolve_url
 from django.utils.http import is_safe_url
 from django.conf import settings as djsettings
-from message.models import Message
+from user.models import Message
 
 from user.models import Users
 import json
@@ -185,5 +185,34 @@ def user_manage(request, aid=None, action=None):
         }
 
         return render(request, 'user/user_manage.html', data)
+    else:
+        raise Http404
+
+
+
+# Create your views here.
+@login_required
+def log_audit(request):
+    '''
+    审计日志
+    '''
+    if request.user.is_superuser:
+        logs = Message.objects.all()[:300]
+
+        if request.method == 'GET':
+            if 'aid' in request.GET:
+                aid = request.get_full_path().split('=')[1]
+                log_detail = Message.objects.filter(id=aid)
+                data = {
+                    'log_detail': log_detail,
+                    'page_name': '日志明细'
+                }
+                return render(request, 'message/log_audit_detail.html',data)
+        data = {
+            'all_logs':logs,
+            'page_name':'审计日志'
+        }
+
+        return render(request, 'message/log_audit.html', data)
     else:
         raise Http404
