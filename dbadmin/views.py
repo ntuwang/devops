@@ -5,7 +5,8 @@ from django.http import Http404, HttpResponse, JsonResponse, StreamingHttpRespon
 from utils.config_parser import ConfParserClass
 import json
 from utils.mydb import MysqlConn
-from .forms import *
+from .forms import DBInfoForm
+from .models import DBInfo
 import traceback
 from collections import OrderedDict
 from django.core.serializers.json import DjangoJSONEncoder
@@ -65,12 +66,12 @@ def db_metadata(request):
         return render(request, 'dba/db_metadata.html', data)
 
     elif request.method == 'POST':
-        cps = ConfParserClass('conf/settings.conf')
+
         db_id = request.POST.get('db_id', '')
-        dbinfo = DBInfo.objects.get(pk=db_id)
-        db_username = cps.get('dbadmin', 'username')
-        db_pass = cps.get('dbadmin', 'password')
-        db_name = dbinfo.db_name
+        db_obj = DBInfo.objects.get(pk=db_id)
+        db_username = db_obj.user.username
+        db_pass = db_obj.user.password
+        db_name = db_obj.db_name
 
         table_name = request.POST.get('table_name', '')
 
@@ -89,7 +90,7 @@ def db_metadata(request):
         try:
             # 获取表元数据
 
-            with MysqlConn(dbinfo.db_ip, dbinfo.db_port, "information_schema", db_username, db_pass,
+            with MysqlConn(db_obj.db_ip, db_obj.db_port, "information_schema", db_username, db_pass,
                            cursorclass=1) as cur:
                 # 获取创建表的语句
                 create_sql = """show create table {0}.{1};""".format(db_name, table_name)
@@ -212,12 +213,12 @@ def db_manage(request, aid=None, action=None):
 
 @login_required()
 def get_table_list(request):
-    cps = ConfParserClass('conf/settings.conf')
+
     db_id = request.POST.get('db_id', '')
-    dbinfo = DBInfo.objects.get(pk=db_id)
-    db_username = cps.get('dbadmin', 'username')
-    db_pass = cps.get('dbadmin', 'password')
-    da_name = dbinfo.db_name
+    db_obj = DBInfo.objects.get(pk=db_id)
+    db_username = db_obj.user.username
+    db_pass = db_obj.user.password
+    da_name = db_obj.db_name
     table_list = []
 
     data = {
@@ -228,7 +229,7 @@ def get_table_list(request):
 
     try:
         # 获取表名称
-        with MysqlConn(dbinfo.db_ip, dbinfo.db_port, da_name, db_username, db_pass) as cur:
+        with MysqlConn(db_obj.db_ip, db_obj.db_port, da_name, db_username, db_pass) as cur:
             sql = """show tables;"""
             cur.execute(sql)
             table_list = [table[0] for table in cur.fetchall()]

@@ -1,4 +1,5 @@
 from django.db import models
+from asset.models import AssetLoginUser
 
 # Create your models here.
 
@@ -16,6 +17,7 @@ class DBInfo(models.Model):
     comment = models.TextField(blank=True, null=True, verbose_name='描述')
     ctime = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     utime = models.DateTimeField(auto_now_add=True, verbose_name='更新时间')
+    user = models.ForeignKey(AssetLoginUser, blank=True, null=True, verbose_name=u'登录用户', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.db_name
