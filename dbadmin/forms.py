@@ -12,5 +12,6 @@ class DBInfoForm(forms.ModelForm):
             'db_port': forms.TextInput(attrs={'type':'number','class': 'form-control', 'required': 'required'}),
             'status': forms.Select(attrs={'type':'number','class': 'form-control', 'required': 'required'}),
             'comment': forms.TextInput(attrs={'class': 'form-control', 'required': 'required'}),
+            'user':forms.Select(attrs={'type':'number','class': 'form-control', 'required': 'required'}),
 
         }
