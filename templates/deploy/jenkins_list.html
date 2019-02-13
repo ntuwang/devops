@@ -1,4 +1,5 @@
 {% extends 'base/base.html' %}
+{% block title %} {{ page_name }} {% endblock %}
 {% block stylesheets %}
     {{ block.super }}
     <link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
@@ -14,11 +15,8 @@
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <div class="x_panel">
                         <div class="x_title">
-                            <a href="{% url 'code_deploy_add' %}" style="float:left;" class="btn btn-info btn-sm"
-                               role="button" {% if not perms.asset.edit_asset %}disabled{% endif %}><i
-                                    class="fa fa-plus"></i>新建发布</a>
-                            <div class="loading"></div>
-                            <h2>发布列表 </h2>
+
+                            <h2>任务列表 </h2>
                             <ul class="nav navbar-right panel_toolbox">
                                 <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                 </li>
@@ -120,8 +118,8 @@
                             title: '操作',
                             formatter: function (value, row, index) {
                                 var url = '{% url 'code_deploy_manage' action='progress' aid='999999' %}'.replace(/999999/,row.id);
-                                var x = '<a href="' + url + '" class="btn btn-xs btn-info"><i class="fa fa-eye"></i> 日志 </a>';
-                                var y = '<a href="' + url + '" class="btn btn-xs btn-warning"><i class="fa fa-history"></i> 回滚 </a>';
+                                var x = '<a href="' + url + '" class="btn btn-xs btn-info"><i class="fa fa-eye"></i> 最近日志 </a>';
+                                var y = '<a href="' + url + '" class="btn btn-xs btn-warning"><i class="fa fa-history"></i> 开始构建 </a>';
                                 return x + y;
                             },
                         },

@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include,re_path
 from django.conf.urls import url
-
+from django.http import HttpResponse
 urlpatterns = [
     path('admin/', admin.site.urls,name='admin'),
     path(r'', include('user.urls')),
@@ -24,4 +24,5 @@ urlpatterns = [
     path(r'sysadmin/', include('sysadmin.urls')),
     path(r'deploy/', include('deploy.urls')),
     path(r'dbadmin/', include('dbadmin.urls')),
+    url(r'^robots\.txt$', lambda r: HttpResponse('User-agent: *\nDisallow: /admin', content_type='text/plain')),
 ]

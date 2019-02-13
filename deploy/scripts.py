@@ -13,15 +13,14 @@ import traceback
 import base64
 from utils.config_parser import ConfParserClass
 from utils.saltapi import SaltApi
+from urllib.parse import urljoin
 
 
-def deploy_thread(deploy):
+def deploy_thread(deploy_id):
     cp = ConfParserClass('conf/settings.conf')
-    deploy_service = DeploysService(deploy.id)
-    jenkins_ip = cp.get('jenkins', 'url')
-    jenkins_job = deploy.project.jenkins_name
-    jenkins_user = cp.get('jenkins', 'user')
-    jenkins_pass = base64.b64decode(cp.get('jenkins', 'pass'))
+    deploy_service = DeploysService(deploy_id)
+    deploy = Deploys.objects.get(pk=deploy_id)
+
     salt_url = cp.get('saltstack', 'url')
     salt_username = cp.get('saltstack', 'username')
     salt_password = cp.get('saltstack', 'password')
@@ -32,40 +31,21 @@ def deploy_thread(deploy):
         return
     try:
         deploy_service.update_deploy(progress=0, status=2)
-
-        # =======before checkout========
-        deploy_service.update_deploy(progress=5, status=2)
-        deploy_service.append_comment("Jenkins 任务：\n--任务名称:{0}\n".format(jenkins_job))
-        time.sleep(8)
-
-        # ======== Jenkins ========
-        if deploy.jenkins_job.strip() == 'yes':
-            deploy_service.append_comment("--拉取代码并编译打包（by git and maven）\n")
-            jenkins = JenkinsJob(username=jenkins_user, password=jenkins_pass,
-                                 jobname='{0}'.format(jenkins_job))
-            j = jenkins.jobbuild()
-            result = j['result']
-            num = int(j['num'])
-            if not result == 'SUCCESS':
-                deploy_service.append_comment("--Jenkins 构建失败\n\n")
-                raise Exception("Jenkins")
-            else:
-                deploy_service.append_comment(
-                    "--Jenkins 构建成功\n"
-                    "--任务日志请访问:/deploy/code/jenkins/?jobname={0}.{1}&&num={2}\n\n".format(
-                        deploy.branch, jenkins_job, num))
-        else:
-            deploy_service.append_comment("--Jenkins 任务本次不执行构建\n\n")
-        time.sleep(8)
-        deploy_service.update_deploy(progress=15, status=2)
-
         deploy_service.append_comment("开始部署:\n")
+
+        time.sleep(3)
         # ========= checkouting ==========
+        deploy_service.update_deploy(progress=10, status=2)
         deploy_service.append_comment("检出应用程序包。。。\n")
+        url = urljoin(settings.NG_FILE_BASE,deploy.project.name,deploy.version)
+        url = urljoin(url,deploy.pkg_name)
         time.sleep(1)
         sapi.remote_execution('*', 'cmd.run',
-                              'wget http://devops-wctest.chinacloudapp.cn/file_download_manage/test01.war -o /root/test01.war')
+                              'wget {0} -o {1}'.format(url,deploy.project.target_path))
         time.sleep(8)
+        deploy_service.append_comment("下载完成\n")
+        deploy_service.update_deploy(progress=15, status=2)
+
         # =========== before deploy  =================
         deploy_service.append_comment("准备部署 目标主机： {0}\n".format(deploy.host.public_ip))
         cmd = ("mkdir -p {remote_history_dir} && chmod -R 777 {remote_history_dir}".format(
@@ -81,11 +61,11 @@ def deploy_thread(deploy):
         time.sleep(8)
         # ========== create dest dirs ===================
 
-        cmd = ("mkdir -p {dest_path} ".format(dest_path=deploy.project.dest_path))
+        cmd = ("mkdir -p {dest_path} ".format(dest_path=deploy.project.deploy_path))
         sapi.remote_execution(deploy.host.public_ip, 'cmd.run', cmd)
         # execute(hostfab.remoted, rd=cmd, sudoif=1)
 
-        deploy_service.append_comment("部署完成!\n")
+        deploy_service.append_comment("部署结束!\n")
         deploy_service.update_deploy(progress=83, status=2)
         time.sleep(8)
         # =============== after deploy =============
@@ -124,7 +104,7 @@ class DeploysService(object):
 
     def start_deploy(self, ):
         t = threading.Thread(target=deploy_thread,
-                             args=(self.deploy,),
+                             args=(self.deploy_id,),
                              name="pydelo-deploy[%d]" % self.deploy.id)
 
         t.start()

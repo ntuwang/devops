@@ -7,8 +7,6 @@ from asset.models import ServerAsset
 class Projects(models.Model):
 
     name = models.CharField(max_length=50, blank=True, verbose_name=u'项目名称')
-    jenkins_name = models.CharField(max_length=50, blank=True, verbose_name=u'Jenkins任务名称')
-    version = models.CharField(max_length=100, blank=True, verbose_name=u'版本')
     target_path = models.CharField(max_length=100, blank=True, verbose_name=u'目标路径')
     deploy_path = models.CharField(max_length=100, blank=True, verbose_name=u'部署路径')
     before_deploy = models.CharField(max_length=100, blank=True, verbose_name=u'部署前脚本')
@@ -49,8 +47,9 @@ class Deploys(models.Model):
 
     user = models.ForeignKey(Users,on_delete=models.CASCADE)
     project = models.ForeignKey(Projects, verbose_name='发布项目',on_delete=models.CASCADE)
+    version = models.CharField(max_length=100, blank=True, verbose_name=u'版本')
+    pkg_name = models.CharField(max_length=100, blank=True, verbose_name=u'包名')
     host = models.ForeignKey(ServerAsset, blank=True, null=True, verbose_name='目标主机',on_delete=models.CASCADE)
-    jenkins_job = models.CharField(max_length=10, blank=True, null=True, choices=jenkins_list, verbose_name='Jenkins任务')
     progress = models.IntegerField(default=0, verbose_name='进度')
     status = models.IntegerField(default=0,choices=status_list, verbose_name='状态')
     comment = models.TextField(blank=True, null=True, verbose_name='记录')

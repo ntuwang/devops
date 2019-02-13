@@ -199,8 +199,9 @@ def code_deploy_manage(request, aid=None, action=None):
 @login_required
 def jenkins_list(request):
     if request.method == 'GET':
+        page_name = 'Jenkins 管理'
 
-        return render(request,'deploy/jenkins_list.html')
+        return render(request,'deploy/jenkins_list.html',{'page_name':page_name})
     elif request.method == 'POST':
         cp = ConfParserClass('conf/settings.conf')
         J = JenkinsJob(cp.get('jenkins', 'url'), cp.get('jenkins', 'username'), cp.get('jenkins', 'password'))

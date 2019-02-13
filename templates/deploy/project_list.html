@@ -42,8 +42,8 @@
                                     <tr>
                                         <th>详细</th>
                                         <th>项目名称</th>
-                                        <th>类型</th>
-                                        <th>Jenkins任务名</th>
+                                        <th>目标路径</th>
+                                        <th>部署路径</th>
 
                                         {% if perms.deploy.edit_deploy %}
                                             <th>操作</th>
@@ -56,8 +56,8 @@
                                             <td><a href="{% url 'project_list' %}?aid={{ each_project.pk }}"><i
                                                     class="fa fa-envelope"></i></a></td>
                                             <td>{{ each_project.name }}</td>
-                                            <td>{{ each_project.app_type }}</td>
-                                            <td>{{ each_project.jenkins_name }}</td>
+                                            <td>{{ each_project.target_path }}</td>
+                                            <td>{{ each_project.deploy_path }}</td>
                                             {% if perms.deploy.edit_deploy %}
                                                 <td>
                                                     <a href="{% url 'project_manage' aid=each_project.pk action='edit' %}"
