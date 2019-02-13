@@ -17,10 +17,11 @@ from urllib.parse import urljoin
 
 
 def deploy_thread(deploy_id):
-    cp = ConfParserClass('conf/settings.conf')
+
     deploy_service = DeploysService(deploy_id)
     deploy = Deploys.objects.get(pk=deploy_id)
 
+    cp = ConfParserClass('conf/settings.conf')
     salt_url = cp.get('saltstack', 'url')
     salt_username = cp.get('saltstack', 'username')
     salt_password = cp.get('saltstack', 'password')

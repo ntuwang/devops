@@ -44,13 +44,40 @@ def remote_execution(request):
     salt远程命令界面
     '''
     if request.user.has_perm('deploy.view_deploy'):
-        tgt_list = ServerAsset.objects.all()
-        data = {
-            'tgt_list': tgt_list,
-            'page_name': '远程命令'
-        }
+        if request.method == 'GET':
+            tgt_list = ServerAsset.objects.all()
+            data = {
+                'tgt_list': tgt_list,
+                'page_name': '远程命令'
+            }
 
-        return render(request, 'operation/remote_exec.html', data)
+            return render(request, 'operation/remote_exec.html', data)
+
+        else:
+            print(request.POST)
+            host = request.POST.getlist('host[]',[])
+            command = request.POST.get('command','')
+            if host and command:
+                res = {}
+                for x in host:
+                    cp = ConfParserClass('conf/settings.conf')
+                    salt_url = cp.get('saltstack', 'url')
+                    salt_username = cp.get('saltstack', 'username')
+                    salt_password = cp.get('saltstack', 'password')
+
+                    sapi = SaltApi(url=salt_url, username=salt_username, password=salt_password)
+                    res[x] = sapi.remote_execution(x, 'cmd.run',command)
+
+                    Message.objects.create(type=u'系统管理', user=request.user, action='远程命令',
+                                           action_ip=UserIP(request),
+                                           content= u'command:{0},host:{1}'.format(command,host))
+            else:
+                res = '主机和命令不能为空'
+
+            data = {
+                'res':res
+            }
+            return JsonResponse(data)
     else:
         raise Http404
 

@@ -68,7 +68,7 @@
                                                         class="required">*</span>
                                                 </label>
                                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                                    <input type="text" class="form-control" id="esingle" name="arg"
+                                                    <input type="text" class="form-control" id="id_command" name="arg"
                                                            value="{{ arg }}" required="required">
                                                 </div>
                                             </div>
@@ -77,9 +77,9 @@
                                                 <div class="col-md-6 col-md-offset-3">
                                                     {#                                                <input type="submit" name="send" class="btn btn-success" value="提交">#}
                                                     <span class="esingle">
-                                                <a href="#"
-                                                   name="panel-single" role="button" class="btn btn-success">运行</a>
-                                                </span>
+                                                        <input id="submit" type="button" value="运行"
+                                                               class="btn btn-primary queryButton"/>
+                                                    </span>
                                                     <a href="#" onclick="show_result();" role="button"
                                                        class="btn btn-info">查看结果</a>
                                                 </div>
@@ -105,13 +105,14 @@
                                         &times;
                                     </button>
                                     <b class="modal-title" id="result-modal" style="color:#f8f8f2">运行结果</b>&nbsp;
-                                    <a href="#"   role="button"
+                                    <a href="#" role="button"
                                        class="btn btn-dark btn-xs">重新查询</a>
                                     <a href="#" onclick="collapse(this);" state="0" role="button"
                                        class="btn btn-dark btn-xs">展开所有</a>
                                 </div>
                                 <div id="modal-body" class="modal-body">
                                     <div class="panel-group" id="accordion">
+
                                     </div>
                                 </div>
                                 <!--<div class="modal-footer">
@@ -139,6 +140,34 @@
             $('.selectpicker').selectpicker({
                 noneSelectedText: '======请选择=====' //默认显示内容
             });
+
+            $('#submit').click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "#",
+                    data: {
+                        'host': $('#id_tgt_select').val(),
+                        'command': $('#id_command').val(),
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+
+                    dataType: 'json',
+                    beforeSend: function (xhr, settings) {
+                    },
+                    success: function (data) {
+                        if (data.status == "error") {
+
+                            alert(data.result_content)
+                        } else {
+                            console.log(data);
+                            $('#modal-body').text(JSON.stringify(data));
+                            $('#result-modal-salt').modal()
+                        }
+                    }
+                });
+            });
+
+
 
         });
 
