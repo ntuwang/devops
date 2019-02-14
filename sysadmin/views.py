@@ -33,7 +33,7 @@ def file_upload(request):
             'tgt_list': tgt_list,
             'page_name': '文件上传'
         }
-        return render(request, 'operation/file_upload.html', data)
+        return render(request, 'sysadmin/file_upload.html', data)
     else:
         raise Http404
 
@@ -51,14 +51,14 @@ def remote_execution(request):
                 'page_name': '远程命令'
             }
 
-            return render(request, 'operation/remote_exec.html', data)
+            return render(request, 'sysadmin/remote_exec.html', data)
 
         else:
             print(request.POST)
             host = request.POST.getlist('host[]',[])
             command = request.POST.get('command','')
             if host and command:
-                res = {}
+                res = []
                 for x in host:
                     cp = ConfParserClass('conf/settings.conf')
                     salt_url = cp.get('saltstack', 'url')
@@ -66,18 +66,16 @@ def remote_execution(request):
                     salt_password = cp.get('saltstack', 'password')
 
                     sapi = SaltApi(url=salt_url, username=salt_username, password=salt_password)
-                    res[x] = sapi.remote_execution(x, 'cmd.run',command)
+                    c = sapi.remote_execution(x, 'cmd.run',command)
+                    res.append(c)
 
                     Message.objects.create(type=u'系统管理', user=request.user, action='远程命令',
                                            action_ip=UserIP(request),
                                            content= u'command:{0},host:{1}'.format(command,host))
             else:
-                res = '主机和命令不能为空'
+                res = []
 
-            data = {
-                'res':res
-            }
-            return JsonResponse(data)
+            return JsonResponse(res,safe=False)
     else:
         raise Http404
 
@@ -119,7 +117,7 @@ def aliyun_dns_list(request):
                 "all_dns_list": dr_list
             }
 
-            return render(request, 'operation/dns_list.html', data)
+            return render(request, 'sysadmin/dns_list.html', data)
     else:
         raise Http404
 
@@ -130,7 +128,7 @@ def web_term(request):
     data = {
         "page_name": page_name,
     }
-    return render(request, 'operation/web_term.html', data)
+    return render(request, 'sysadmin/web_term.html', data)
 
 
 def taillog(request, hostname, port, username, password, private, tail):
@@ -166,7 +164,7 @@ def web_log(request):
             "page_name": 'web日志',
             "hosts": hosts
         }
-        return render(request, 'operation/web_log.html', data)
+        return render(request, 'sysadmin/web_log.html', data)
     if request.method == "POST":
         status = request.POST.get('status', None)
         if not status:

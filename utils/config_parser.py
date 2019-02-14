@@ -52,7 +52,7 @@ class ConfParserClass(object):
 
 if __name__ == '__main__':
     config_file = 'devops/config_demo.conf'
-    cp = Conf_Parser(config_file)
+    cp = ConfParserClass(config_file)
     print(cp.sections())
     print(cp.items('CmdWindow'))
     print(cp.options('CmdWindow'))

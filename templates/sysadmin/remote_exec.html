@@ -80,8 +80,6 @@
                                                         <input id="submit" type="button" value="运行"
                                                                class="btn btn-primary queryButton"/>
                                                     </span>
-                                                    <a href="#" onclick="show_result();" role="button"
-                                                       class="btn btn-info">查看结果</a>
                                                 </div>
                                             </div>
                                             </fieldset>
@@ -105,14 +103,9 @@
                                         &times;
                                     </button>
                                     <b class="modal-title" id="result-modal" style="color:#f8f8f2">运行结果</b>&nbsp;
-                                    <a href="#" role="button"
-                                       class="btn btn-dark btn-xs">重新查询</a>
-                                    <a href="#" onclick="collapse(this);" state="0" role="button"
-                                       class="btn btn-dark btn-xs">展开所有</a>
                                 </div>
                                 <div id="modal-body" class="modal-body">
                                     <div class="panel-group" id="accordion">
-
                                     </div>
                                 </div>
                                 <!--<div class="modal-footer">
@@ -159,14 +152,21 @@
 
                             alert(data.result_content)
                         } else {
-                            console.log(data);
-                            $('#modal-body').text(JSON.stringify(data));
+
+                            for (var i = 0, l = data.length; i < l; i++) {
+                                for (var key in data[i]) {
+                                    var v = data[i][key].replace(/\\n/g,'<br />');
+                                    console.log(v);
+                                    $('#accordion').append('<br />');
+                                    $('#accordion').append(key + ':<br />' + v);
+                                }
+                            }
+
                             $('#result-modal-salt').modal()
                         }
                     }
                 });
             });
-
 
 
         });

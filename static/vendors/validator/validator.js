@@ -391,7 +391,7 @@ var validator = (function($){
             fieldsToCheck = $form.find(':input').filter('[required=required], .required, .optional').not('[disabled=disabled]');
 
         fieldsToCheck.each(function(){
-            // use an AND operation, so if any of the fields returns 'false' then the submitted result will be also FALSE
+            // use an AND sysadmin, so if any of the fields returns 'false' then the submitted result will be also FALSE
             submit = submit * checkField.apply(this);
         });
 
