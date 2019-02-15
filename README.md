@@ -4,23 +4,10 @@ demo（只是个空架子  大部分功能没开放出来，等权限完成后�
 
 地址 http://gce.dev4ops.cn/
 
-用户名 wc
+用户名 admin
    
 密码 ASDasd!@#123
 
-![image](demo/demo.gif)
-
-实时日志
-
-![image](demo/tailf.gif)
-
-代码部署
-
-![image](demo/codedeploy.gif)
-
-数据库管理
-
-![image](demo/database.gif)
 #### 项目介绍
 devops 自动化运维平台--一站式满足需求
 

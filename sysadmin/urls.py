@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^salt_group_manage/(?P<id>\d+)/edit/$', oviews.salt_group_manage, name='salt_group_edit'),
 
     url(r'^task_list/$', oviews.salt_task_list, name='task_list'),
+    url(r'^salt_history_list/$', oviews.salt_history_list, name='salt_history_list'),
     url(r'^task_check/$', oviews.salt_task_check, name='task_check'),
     url(r'^task_running/$', oviews.salt_task_running, name='task_running'),
 ]

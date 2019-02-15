@@ -328,3 +328,9 @@ function init_selectpicker() {
         noneSelectedText: '======请选择=====' //默认显示内容
     });
 }
+
+$(document).ready(function () {
+
+    init_DataTables();
+
+});

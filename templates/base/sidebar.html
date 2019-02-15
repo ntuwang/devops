@@ -91,10 +91,11 @@
                 </li>
                 <li><a><i class="fa fa-bars"></i> salt管理 <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                        <li><a href="{% url 'salt_key_list' %}">salt主机列表</a></li>
-                        <li><a href="{% url 'salt_group_list' %}">salt分组管理</a>
+                        <li><a href="{% url 'salt_key_list' %}">主机列表</a></li>
+                        <li><a href="{% url 'salt_group_list' %}">分组管理</a>
                             {#                        <li><a href="{% url 'task_list' %}">任务列表</a></li>#}
-                        <li><a href="{% url 'task_check' %}">salt任务查询</a></li>
+                        <li><a href="{% url 'task_check' %}">任务查询</a></li>
+                        <li><a href="{% url 'salt_history_list' %}">历史任务</a></li>
                         {#                        <li><a href="{% url 'task_running' %}">存活任务</a></li>#}
                     </ul>
                 </li>

@@ -37,9 +37,12 @@ class ConfParserClass(object):
             return self.cf.remove_option(s, o)
         return False
 
-    # 返回节内的(key, val)列表
-    def items(self, s):
-        return self.cf.items(s)
+    # 返回节内的(key, val)列表or字典
+    def items(self, s,dict_type=False):
+        if dict_type:
+            return dict(self.cf.items(s))
+        else:
+            return self.cf.items(s)
 
     # 返回所有节的列表
     def sections(self):

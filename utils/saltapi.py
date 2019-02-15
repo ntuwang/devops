@@ -73,6 +73,12 @@ class SaltApi(object):
         r = self.__post(json=params)
         return r[1]['return'][0]
 
+    def salt_history_jobs(self):
+        """ show all history jobs """
+        params = {'client': 'runner', 'fun': 'jobs.list_jobs'}
+        r = self.__post(json=params)
+        return r
+
     def run(self, params):
         """ remote common interface, you need custom data dict
             for example:

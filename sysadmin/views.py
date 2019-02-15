@@ -66,7 +66,7 @@ def remote_execution(request):
                     salt_password = cp.get('saltstack', 'password')
 
                     sapi = SaltApi(url=salt_url, username=salt_username, password=salt_password)
-                    c = sapi.remote_execution(x, 'cmd.run',command)
+                    c = sapi.async_remote_execution(x, 'cmd.run',command)
                     res.append(c)
 
                     Message.objects.create(type=u'系统管理', user=request.user, action='远程命令',
@@ -438,6 +438,31 @@ def salt_ajax_minions(request):
     else:
         raise Http404
 
+@login_required
+def salt_history_list(request):
+    '''
+    任务列表
+    '''
+    if request.user.has_perm('userperm.view_message'):
+        cp = ConfParserClass('conf/settings.conf')
+        args = cp.items('saltstack',dict_type=True)
+        sapi = SaltApi(**args)
+        res = sapi.salt_history_jobs()[1]['return'][0]
+        his = []
+        for k,v in res.items():
+            x = {}
+            x['jid'] = k
+            x = dict(x,**v)
+            his.append(x)
+
+        page_name = 'salt历史任务'
+        data = {
+            'page_name':page_name,
+            'his':his
+        }
+        return render(request, 'saltstack/salt_history_list.html',data)
+    else:
+        raise Http404
 
 
 @login_required
