@@ -56,7 +56,10 @@ def remote_execution(request):
         else:
             print(request.POST)
             host = request.POST.getlist('host[]',[])
-            command = request.POST.get('command','')
+            # command = request.POST.get('command','')
+
+            # 保险起见，命令先写死
+            command = 'ls /root'
             if host and command:
                 res = []
                 for x in host:
@@ -66,7 +69,7 @@ def remote_execution(request):
                     salt_password = cp.get('saltstack', 'password')
 
                     sapi = SaltApi(url=salt_url, username=salt_username, password=salt_password)
-                    c = sapi.async_remote_execution(x, 'cmd.run',command)
+                    c = sapi.remote_execution(x, 'cmd.run',command)
                     res.append(c)
 
                     Message.objects.create(type=u'系统管理', user=request.user, action='远程命令',
@@ -78,6 +81,7 @@ def remote_execution(request):
             return JsonResponse(res,safe=False)
     else:
         raise Http404
+
 
 def aliyun_dns_list(request):
     cps = ConfParserClass('conf/settings.conf')
