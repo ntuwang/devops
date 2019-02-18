@@ -134,7 +134,6 @@ def web_term(request):
     page_name = '在线终端'
     data = {
         "page_name": page_name,
-        'web_term_url':settings.WEB_TERM_URL
     }
     return render(request, 'sysadmin/web_term.html', data)
 
