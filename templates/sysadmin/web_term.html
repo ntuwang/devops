@@ -155,6 +155,7 @@
 
                 function callback(msg) {
                     console.log(msg);
+                    $.post("#", {username: usernames, hostname: ips,csrfmiddlewaretoken:'{{ csrf_token }}' });
                     if (msg.status) {
                         alert("遇到错误:" + "[ " + msg.status + " ]");
                         // swal("错误", "登陆" + "[ " + msg.status + " ]" + "遇到错误", "error");

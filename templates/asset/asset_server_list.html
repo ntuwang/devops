@@ -155,6 +155,7 @@
 
 
                         function callback(msg) {
+                            $.post("/sysadmin/web_term/", {username: usernames, hostname: ips,csrfmiddlewaretoken:'{{ csrf_token }}' });
                             console.log(msg);
                             if (msg.status) {
                                 alert("遇到错误:" + "[ " + msg.status + " ]" );
@@ -163,7 +164,7 @@
                             }
 
 
-                            var    url = "ws://" + host_domain + ":9000/ws?id=" + msg.id,
+                            var url = "ws://" + host_domain + ":9000/ws?id=" + msg.id,
                                 socket = new WebSocket(url),
                                 terminal = document.getElementById('#terminal'),
                                 geometry = current_geometry();

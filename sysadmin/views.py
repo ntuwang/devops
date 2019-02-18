@@ -131,11 +131,19 @@ def aliyun_dns_list(request):
 
 @login_required
 def web_term(request):
-    page_name = '在线终端'
-    data = {
-        "page_name": page_name,
-    }
-    return render(request, 'sysadmin/web_term.html', data)
+    if request.method == 'GET':
+        page_name = '在线终端'
+        data = {
+            "page_name": page_name,
+        }
+        return render(request, 'sysadmin/web_term.html', data)
+    elif request.method == 'POST':
+        hostname = request.POST.get('hostname','')[0:6] + '...'
+        username = request.POST.get('username','')
+        Message.objects.create(type=u'系统管理', user=request.user, action='web终端',
+                               action_ip=UserIP(request),
+                               content=u'用户名:{0}; 目标服务器:{1}'.format(username, hostname))
+        return HttpResponse(u'username:{0};hostname:{1}'.format(username, hostname))
 
 
 def taillog(request, hostname, port, username, password, private, tail):
