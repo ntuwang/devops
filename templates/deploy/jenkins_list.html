@@ -117,9 +117,10 @@
                             field: 'operate',
                             title: '操作',
                             formatter: function (value, row, index) {
-                                var url = '{% url 'jenkins_manage_detail' action='view' j_name='999999' %}'.replace(/999999/,row.job_name);
-                                var x = '<a href="' + url + '" class="btn btn-xs btn-info"><i class="fa fa-eye"></i> 最近日志 </a>';
-                                var y = '<a href="' + url + '" class="btn btn-xs btn-warning"><i class="fa fa-history"></i> 开始构建 </a>';
+                                var url1 = '{% url 'jenkins_manage_detail' action='view' j_name='999999' %}'.replace(/999999/,row.job_name);
+                                var url2 = '{% url 'jenkins_manage_detail' action='build' j_name='999999' %}'.replace(/999999/,row.job_name);
+                                var x = '<a href="' + url1 + '" class="btn btn-xs btn-info"><i class="fa fa-eye"></i> 最近日志 </a>';
+                                var y = '<a href="' + url2 + '" class="btn btn-xs btn-warning"><i class="fa fa-history"></i> 开始构建 </a>';
                                 return x + y;
                             },
                         },

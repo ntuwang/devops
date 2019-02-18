@@ -11,7 +11,19 @@ from .models import Deploys, Projects
 from user.models import Users
 from utils.jenkins_job import JenkinsJob
 from utils.config_parser import ConfParserClass
+from user.models import Message
 
+def UserIP(request):
+    '''
+    获取用户IP
+    '''
+
+    ip = ''
+    if 'HTTP_X_FORWARDED_FOR' in request.META:
+        ip = request.META['HTTP_X_FORWARDED_FOR']
+    else:
+        ip = request.META['REMOTE_ADDR']
+    return ip
 
 @login_required
 def project_list(request):
@@ -223,14 +235,17 @@ def jenkins_manage(request, j_name=None, action=None):
         elif action == 'edit':  # 编辑构建项目
             page_name = '编辑构建项目'
         elif action == 'delete':  # 删除构建项目
-            return redirect('code_deploy_list')
+            pass
         elif action == 'view':  # 查看构建项目
             """获取console信息"""
             ret = J.job_console(j_name)
             return HttpResponse(ret)
         elif action == 'build':  # 开始构建项目
+            Message.objects.create(type=u'部署管理', user=request.user, action='构建jenkins',
+                                   action_ip=UserIP(request),
+                                   content=u'JOB名称:{0}'.format(j_name))
             J.job_build(j_name)
-            return redirect('code_deploy_list')
+        return redirect('jenkins_manage',action='list')
 
     else:
         raise Http404
