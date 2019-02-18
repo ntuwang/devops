@@ -21,6 +21,9 @@ from django.db.models import F
 import datetime
 from asset.models import ServerAsset
 from sysadmin.models import DnsRecords
+import shutil
+from django.conf import settings
+
 
 @login_required
 def file_upload(request):
@@ -128,9 +131,10 @@ def aliyun_dns_list(request):
 
 @login_required
 def web_term(request):
-    page_name = '发布详情'
+    page_name = '在线终端'
     data = {
         "page_name": page_name,
+        'web_term_url':settings.WEB_TERM_URL
     }
     return render(request, 'sysadmin/web_term.html', data)
 
@@ -169,7 +173,7 @@ def web_log(request):
             "hosts": hosts
         }
         return render(request, 'sysadmin/web_log.html', data)
-    if request.method == "POST":
+    elif request.method == "POST":
         status = request.POST.get('status', None)
         if not status:
             ret = {'status': True, 'error': None, }
@@ -193,22 +197,19 @@ def web_log(request):
             except Exception as e:
                 ret['status'] = False
                 ret['error'] = "错误{0}".format(e)
+            Message.objects.create(type=u'系统管理', user=request.user, action='web日志',
+                                   action_ip=UserIP(request),
+                                   content=u'status:{0};error:{1}'.format(ret['status'],ret['error']))
             return JsonResponse(ret)
         else:
             ret = {'status': True, 'error': None, }
             user = request.user.username
             os.environ[user] = "false"
             print(2, os.environ[user])
+            Message.objects.create(type=u'系统管理', user=request.user, action='web日志',
+                                   action_ip=UserIP(request),
+                                   content=u'status:{0};error:{1}'.format(ret['status'],ret['error']))
             return HttpResponse(json.dumps(ret))
-
-
-
-try:
-    import json
-except ImportError:
-    import simplejson as json
-import datetime
-import shutil
 
 
 cps = ConfParserClass('conf/settings.conf')
