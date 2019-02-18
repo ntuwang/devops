@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^deploy_list/$', dviews.code_deploy_list, name='code_deploy_list'),
     url(r'^deploy_add/$', dviews.code_deploy_manage, name='code_deploy_add'),
     url(r'^deploy_manage/(?P<action>[\w-]+)/(?P<aid>\d+)/$', dviews.code_deploy_manage, name='code_deploy_manage'),
-    url(r'^jenkins_list/$', dviews.jenkins_list, name='jenkins_list'),
+    url(r'^jenkins_manage_detail/(?P<action>[\w-]+)/(?P<j_name>[\w-]+)/$', dviews.jenkins_manage, name='jenkins_manage_detail'),
+    url(r'^jenkins_manage/(?P<action>[\w-]+)/$', dviews.jenkins_manage, name='jenkins_manage'),
 
 ]

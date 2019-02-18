@@ -131,7 +131,7 @@ def code_deploy_list(request):
 @login_required
 def code_deploy_manage(request, aid=None, action=None):
     """
-    Manage Cloud
+    Manage code deploy
     """
     if request.user.has_perms(['asset.view_asset', 'asset.edit_asset']):
         page_name = ''
@@ -197,18 +197,41 @@ def code_deploy_manage(request, aid=None, action=None):
 
 
 @login_required
-def jenkins_list(request):
-    if request.method == 'GET':
-        page_name = 'Jenkins 管理'
-
-        return render(request,'deploy/jenkins_list.html',{'page_name':page_name})
-    elif request.method == 'POST':
+def jenkins_manage(request, j_name=None, action=None):
+    """
+    Manage Jenkins
+    """
+    if request.user.has_perms(['asset.view_asset', 'asset.edit_asset']):
         cp = ConfParserClass('conf/settings.conf')
         J = JenkinsJob(cp.get('jenkins', 'url'), cp.get('jenkins', 'username'), cp.get('jenkins', 'password'))
-        job_names = J.job_list()
-        job_list = [J.job_query(j) for j in job_names]
-        data = {
-            'total':len(job_list),
-            'rows':job_list
-        }
-        return JsonResponse(data)
+        if action == 'add':
+            pass
+        elif action == 'list':
+            if request.method == 'GET':
+                page_name = 'Jenkins 管理'
+
+                return render(request, 'deploy/jenkins_list.html', {'page_name': page_name})
+            elif request.method == 'POST':
+                job_names = J.job_list()
+                job_list = [J.job_query(j) for j in job_names]
+                data = {
+                    'total': len(job_list),
+                    'rows': job_list
+                }
+                return JsonResponse(data)
+
+        elif action == 'edit':  # 编辑构建项目
+            page_name = '编辑构建项目'
+        elif action == 'delete':  # 删除构建项目
+            return redirect('code_deploy_list')
+        elif action == 'view':  # 查看构建项目
+            """获取console信息"""
+            ret = J.job_console(j_name)
+            return HttpResponse(ret)
+        elif action == 'build':  # 开始构建项目
+            J.job_build(j_name)
+            return redirect('code_deploy_list')
+
+    else:
+        raise Http404
+
