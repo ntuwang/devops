@@ -118,6 +118,8 @@
     <script>
         jQuery(function ($) {
             $(document).on('click', '.webssh', function (event) {
+                var host_domain = document.domain;
+                var http_url = "http://" + host_domain + ":9000/";
 
 
                 event.preventDefault();
@@ -138,7 +140,7 @@
                         var passwords = obj.password;
 
                         $.ajax({
-                            url: "http://127.0.0.1:9000/",
+                            url: http_url,
                             type: 'POST',
                             data: {hostname: ips, port: ports, username: usernames, password: passwords},
                             crossDomain: true,
@@ -161,7 +163,7 @@
                             }
 
 
-                            var    url = "ws://127.0.0.1:9000/" + 'ws?id=' + msg.id,
+                            var    url = "ws://" + host_domain + ":9000/ws?id=" + msg.id,
                                 socket = new WebSocket(url),
                                 terminal = document.getElementById('#terminal'),
                                 geometry = current_geometry();
