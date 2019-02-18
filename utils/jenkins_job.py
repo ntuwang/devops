@@ -9,11 +9,12 @@ from datetime import datetime,timezone,timedelta
 
 
 class JenkinsJob(object):
+    """"POST请求必须关闭Jenkins的CSRF，或者提供Jenkins-Crumb（http://192.168.37.100:8080/crumbIssuer/api/xml）"""
     def __init__(self, url, username, password):
         self.server = Jenkins(url, username=username, password=password)
 
     def job_build(self, job_name):
-        params = {'Branch': 'oriin/master', 'host': '192.168.1.100'}
+        params = {}
         ret = self.server.build_job(job_name, params)
         return ret
 
