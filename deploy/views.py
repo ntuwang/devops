@@ -244,7 +244,10 @@ def jenkins_manage(request, j_name=None, action=None):
             Message.objects.create(type=u'部署管理', user=request.user, action='构建jenkins',
                                    action_ip=UserIP(request),
                                    content=u'JOB名称:{0}'.format(j_name))
-            J.job_build(j_name)
+            try:
+                ret = J.job_build(j_name)
+            except:
+                pass
         return redirect('jenkins_manage',action='list')
 
     else:
