@@ -160,10 +160,14 @@ def taillog(request, hostname, port, username, password, private, tail):
     else:
         pkey = paramiko.RSAKey.from_private_key_file("{0}".format(private))
         ssh.connect(hostname=hostname, port=port, username=username, pkey=pkey)
-    cmd = "tail " + tail
+    cmd = "tail -n 10 -f " + tail
     stdin, stdout, stderr = ssh.exec_command(cmd, get_pty=True)
-    for line in iter(stdout.readline, ""):
-        print(1, os.environ.get(user))
+    count = 0
+    s = stdout.readline
+    for line in iter(s, ""):
+
+        print(count, os.environ.get(user))
+        count +=1
         if os.environ.get(user) == 'false':
             break
         result = {"status": 0, 'data': line}

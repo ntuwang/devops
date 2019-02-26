@@ -141,7 +141,7 @@ def user_manage(request, aid=None, action=None):
             user = get_object_or_404(Users, pk=aid)
             if action == 'edit':
                 page_name = '编辑用户'
-            if action == 'delete':
+            elif action == 'delete':
                 if user == request.user:
                     Message.objects.create(type=u'用户管理', user=request.user, action=u'删除用户', action_ip=UserIP(request),
                                            content=u'不能删除当前登录用户')
@@ -151,6 +151,10 @@ def user_manage(request, aid=None, action=None):
                                            content=u'删除用户 %s%s，用户名 %s' % (
                                            user.last_name, user.first_name, user.username))
                 return redirect('user_list')
+            elif action == 'view':
+                user_detail = Users.objects.filter(id=aid)
+                return render(request, 'user/user_profile.html', {'user_detail': user_detail})
+
         else:
             user = Users()
             action = 'add'

@@ -239,7 +239,12 @@ def jenkins_manage(request, j_name=None, action=None):
         elif action == 'view':  # 查看构建项目
             """获取console信息"""
             ret = J.job_console(j_name)
-            return HttpResponse(ret)
+            data = {
+                'ret':ret,
+                'j_name':j_name,
+                'page_name':'日志详情'
+            }
+            return render(request,'deploy/jenkins_detail.html',data)
         elif action == 'build':  # 开始构建项目
             Message.objects.create(type=u'部署管理', user=request.user, action='构建jenkins',
                                    action_ip=UserIP(request),

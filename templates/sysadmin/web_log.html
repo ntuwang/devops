@@ -66,7 +66,7 @@
                                     </label>
                                     <div class="col-md-7">
                                         <input class="form-control" type="text" id="filepath" name="filepath"
-                                               value="-f /var/log/messages"
+                                               value="/root/test.log"
                                                required>
                                     </div>
                                 </div>
@@ -226,7 +226,8 @@
                     $('#output_append').empty();
                     output_html = data;
                 }
-                $("#output_append").prepend(output_html);
+                console.log(output_html);
+                $("#output_append").append(output_html);
             }
         }
 
