@@ -52,11 +52,11 @@
                                                     class="fa fa-envelope "></i></a>
                                         </td>
                                         <td>{{ i.user }}</td>
-                                        <td>{{ i.action_ip|truncatechars:5 }}</td>
+                                        <td>{{ i.action_ip }}</td>
                                         <td>{{ i.audit_time|date:"Y-m-d H:i:s" }}</td>
                                         <td>{{ i.type }}</td>
                                         <td>{{ i.action }}</td>
-                                        <td>{{ i.content|safe|truncatewords:"10" }}</td>
+                                        <td>{{ i.content|safe }}</td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
