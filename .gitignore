@@ -11,7 +11,6 @@ devops/settings_local.py
 devops/settings.py
 *.conf
 *.ini
-.DS_Store
 .vscode
 todolist.md
 nohup.out
