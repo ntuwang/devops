@@ -34,7 +34,12 @@ devops 自动化运维平台--一站式满足需求
 #### 工具依赖
 * Django2
 * Python3
-
+### 安装部署（未完待续，不要上生产）
+* 搭建salt-api，jenkins，git环境
+* 搭建redis，mysql环境
+* 修改配置文件（devops/settings.py && conf/example）
+* 启动django项目
+* 启动web ssh
 #### 参与贡献
 
 项目前后端借鉴了很多开源项目，做了个集成，有需求或者建议，请提交issue
