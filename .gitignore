@@ -6,7 +6,6 @@ __pycache__/
 .idea
 */migrations/*.py
 !__init__.py
-logs/*
 devops/settings_local.py
 devops/settings.py
 *.conf
@@ -15,3 +14,4 @@ devops/settings.py
 todolist.md
 nohup.out
 *.DS_Store
+logs/
