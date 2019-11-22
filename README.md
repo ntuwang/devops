@@ -2,7 +2,7 @@
 
 demo（只是个空架子  大部分功能没开放出来，等权限完成后再打开）
 
-地址 http://tx.dev4ops.cn/
+地址 http://do.dev4ops.cn/
 
 用户名 admin
    
