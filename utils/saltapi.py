@@ -21,7 +21,6 @@ class SaltApi(object):
             password=self.__passwd,
             eauth='pam'
         )
-        self.__token = self.get_token()
 
     def get_token(self):
         """  login salt-api and get token_id """
@@ -34,7 +33,8 @@ class SaltApi(object):
 
     def __post(self, **kwargs):
         """  custom post interface, headers contains X-Auth-Token """
-        headers_token = {'X-Auth-Token': self.__token}
+        __token = self.get_token()
+        headers_token = {'X-Auth-Token': __token}
         headers_token.update(self.headers)
         requests.packages.urllib3.disable_warnings()
         ret = requests.post(url=self.url, verify=False, headers=headers_token, **kwargs)
