@@ -13,8 +13,9 @@ class JenkinsJob(object):
     def __init__(self, url, username, password):
         self.server = Jenkins(url, username=username, password=password)
 
-    def job_build(self, job_name):
-        params = {}
+    def job_build(self, job_name, params=None):
+        if params is None:
+            params = {}
         ret = self.server.build_job(job_name, params)
         return ret
 

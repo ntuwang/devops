@@ -12,6 +12,7 @@ from user.models import Users
 from utils.jenkins_job import JenkinsJob
 from utils.config_parser import ConfParserClass
 from user.models import Message
+import traceback
 
 def UserIP(request):
     '''
@@ -250,9 +251,10 @@ def jenkins_manage(request, j_name=None, action=None):
                                    action_ip=UserIP(request),
                                    content=u'JOB名称:{0}'.format(j_name))
             try:
-                ret = J.job_build(j_name)
+                params = request.POST.get('params', {})
+                ret = J.job_build(j_name, params=params)
             except:
-                pass
+                traceback.print_exc()
         return redirect('jenkins_manage',action='list')
 
     else:

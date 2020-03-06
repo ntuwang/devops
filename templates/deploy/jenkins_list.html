@@ -36,7 +36,7 @@
                             <div class="clearfix"></div>
                         </div>
 
-                        <div class="x_content " >
+                        <div class="x_content ">
                             <table id="table"></table>
                         </div>
 
@@ -45,6 +45,46 @@
             </div>
         </div>
     </div>
+    <!-- 参数化构建模态框 -->
+    <div class="modal fade" id="build-project-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document" style="width:50%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span>构建项目</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <strong id="warningText"></strong>
+                </div>
+                <div class="modal-body" id="body">
+                    <div>
+                        <form method="post" class="form-horizontal form-bordered"
+                              id="id_modal_form"
+                              data-parsley-validate="true">
+
+                            <div class="form-group">
+                                <label class="col-md-2">项目名称:</label>
+                                <div class="col-md-8">
+                                    <span id="job_name"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-md-2">传入参数:</label>
+                                <div class="col-md-8">
+                                    <textarea id="job_params" class="form-control" rows="3" placeholder="JSON格式，没有请留空"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" id="buildProjectBtn">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
 {% block javascripts %}
     {{ block.super }}
@@ -60,7 +100,35 @@
         $(document).ready(function () {
             // 初始化表格
             initTable();
+            $('#buildProjectBtn').click(function () {
+                let job_name = $('#job_name').text()
+                let url = '{% url 'jenkins_manage_detail' action='build' j_name='999999' %}'.replace(/999999/, job_name);
+                let params = $('#job_params').val()
+                $.ajax({
+                    url: url,// 跳转到 action
+                    type: 'post',
+                    contentType: 'application/json; charset=UTF-8',
+                    dataType: 'json',
+                    data: params,
+                    cache: false,
+                    beforeSend: function (xhr, settings) {
+                        xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}')
+                        $("#buildProjectBtn").attr("disabled", "disabled");
+                        $("#buildProjectBtn").text("执行中");
+                    },
+                    success: function (data) {
+                        $('#build-project-modal').hide()
+                    },
+                    complete: function () {
+                        $("#buildProjectBtn").text("执行完成");
+                        window.location.reload();
+                    },
+                    error: function () {
+                    }
+                });
+            })
         });
+
 
         function initTable() {
             $('#table').bootstrapTable({
@@ -113,17 +181,24 @@
                         title: 'build_duration',
                     },
 
-                        {
-                            field: 'operate',
-                            title: '操作',
-                            formatter: function (value, row, index) {
-                                var url1 = '{% url 'jenkins_manage_detail' action='view' j_name='999999' %}'.replace(/999999/,row.job_name);
-                                var url2 = '{% url 'jenkins_manage_detail' action='build' j_name='999999' %}'.replace(/999999/,row.job_name);
-                                var x = '<a href="' + url1 + '" class="btn btn-xs btn-info"><i class="fa fa-eye"></i> 最近日志 </a>';
-                                var y = '<a href="' + url2 + '" class="btn btn-xs btn-warning"><i class="fa fa-history"></i> 开始构建 </a>';
-                                return x + y;
-                            },
+                    {
+                        field: 'operate',
+                        title: '操作',
+                        formatter: function (value, row, index) {
+                            var url1 = '{% url 'jenkins_manage_detail' action='view' j_name='999999' %}'.replace(/999999/, row.job_name);
+                            var url2 = '{% url 'jenkins_manage_detail' action='build' j_name='999999' %}'.replace(/999999/, row.job_name);
+                            var x = '<a href="' + url1 + '" class="btn btn-xs btn-info"><i class="fa fa-eye"></i> 最近日志 </a>';
+                            var y = '<a id="buildJob" class="btn btn-xs btn-warning"><i class="fa fa-history"></i> 开始构建 </a>';
+                            return x + y;
                         },
+                        events: {
+                            'click #buildJob': function (e, value, row, index) {
+                                $('#job_name').text(row.job_name)
+                                $('#build-project-modal').modal()
+                            },
+
+                        },
+                    },
                 ],
             });
         }
