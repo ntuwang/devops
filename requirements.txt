@@ -23,7 +23,7 @@ cryptography==2.4.2
 curtsies==0.3.0
 daphne==2.2.4
 decorator==4.3.0
-Django==2.0.6
+Django==2.2.10
 django-guardian==1.4.9
 fabric==2.4.0
 greenlet==0.4.15
