@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, JsonResponse, StreamingHttpResponse
 
 from aliyunsdkcore.client import AcsClient
-from aliyunsdkcore.request import CommonRequest
+# from aliyunsdkcore.request import CommonRequest
 from utils.config_parser import ConfParserClass
 import json
 from channels.layers import get_channel_layer
