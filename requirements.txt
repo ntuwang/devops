@@ -71,4 +71,4 @@ wcwidth==0.1.7
 webssh==0.7.3
 zope.interface==4.6.0
 pymongo==3.7.2
-djangorestframework==3.9.2
+djangorestframework==3.11.2
