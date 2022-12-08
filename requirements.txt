@@ -12,7 +12,7 @@ backcall==0.1.0
 bcrypt==3.1.5
 blessings==1.7
 bpython==0.17.1
-certifi==2018.11.29
+certifi==2022.12.7
 cffi==1.11.5
 channels==2.0.2
 channels-redis==2.1.0
